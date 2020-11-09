@@ -6,10 +6,125 @@
       :search-client="searchClient"
       index-name="genji"
     >
-      <ais-configure :attributesToSnippet="['label2', 'label']"/>
+      <ais-configure :attributesToSnippet="['text', 'label']"/>
       <v-container class="my-5">
         <v-row>
-          <v-col col="12" sm="4">
+
+          <v-col col="12" sm="8" order-sm="12">
+            <ais-search-box :placeholder="$t('add_a_search_term')" />
+
+            <client-only>
+              <ais-powered-by class="my-2" />
+            </client-only>
+
+            <v-sheet class="pa-4 my-4" color="grey lighten-3">
+              <v-row>
+                <v-col>
+                  <ais-stats>
+                    <p
+                      class="my-0"
+                      slot-scope="{
+                        hitsPerPage,
+                        nbPages,
+                        nbHits,
+                        page,
+                        processingTimeMS,
+                        query,
+                      }"
+                    >
+                      {{ $t('search_result') }}: {{ nbHits.toLocaleString() }} {{ $t('hits') }}
+                    </p>
+                  </ais-stats>
+                </v-col>
+                <v-col class="text-right">
+                  <ais-hits-per-page
+                    :items="[
+                      { label: '24', value: 24, default: true },
+                      { label: '60', value: 60 },
+                      { label: '120', value: 120 },
+                      { label: '512', value: 512 },
+                    ]"
+                  />
+                </v-col>
+              </v-row>
+            </v-sheet>
+
+            <ais-pagination :padding="2" class="my-4" />
+
+            <ais-hits>
+              <v-row slot-scope="{ items }">
+                <v-col
+                  v-for="item in items"
+                  :key="item.objectID"
+                  col="12"
+                  sm="3"
+                >
+                  <v-card flat outlined>
+                    <nuxt-link
+                        :to="localePath({name : 'item-id', params : {id : item.objectID}})"
+                      >
+                      <v-img
+                        contain
+                        max-height="150"
+                        style="height: 150px"
+                        width="100%"
+                        class="grey lighten-2"
+                        :src="item.image"
+                      />
+                    </nuxt-link>
+
+                    <v-card-text>
+                      <nuxt-link
+                        :to="localePath({name : 'item-id', params : {id : item.objectID}})"
+                      >
+                        <h3 class="mb-4">{{item.vol}} {{ item.work }} {{item.page}}コマ目</h3>
+                      </nuxt-link>
+                      
+                      <!--  {{aaa(item)}} -->
+
+                      <p v-if="item._snippetResult.text && item._snippetResult.text.matchLevel != 'none'">
+                        
+                        <ais-snippet
+                          :attribute="'text'"
+                          :hit="item"
+                        />
+                      </p>
+
+                      <p v-if="false">
+                        <ul>
+                          <template v-for="(tag, index) in item.label">
+                            <li v-if="item._snippetResult.label[index].matchLevel != 'none'" :key="tag">
+                              <ais-snippet
+                                :attribute="'label.'+index"
+                                :hit="item"
+                              />
+                            </li>
+                          </template>
+                        </ul>
+                      </p>
+                      
+                      <!--
+                      <p>
+                        <ais-snippet
+                          attribute="label2"
+                          :hit="item"
+                        />
+                      </p>
+                      -->
+
+                      <p>
+                        {{item.attribution}}
+                      </p>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </ais-hits>
+
+            <ais-pagination :padding="2" class="my-4" />
+          </v-col>
+
+          <v-col col="12" sm="4" order-sm="1">
             <v-row>
               <v-col col="12" sm="6">
                 <h2>{{ $t('filter') }}</h2>
@@ -68,111 +183,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col col="12" sm="8">
-            <ais-search-box :placeholder="$t('add_a_search_term')" />
-
-            <client-only>
-              <ais-powered-by class="my-2" />
-            </client-only>
-
-            <v-sheet class="pa-4 my-4" color="grey lighten-3">
-              <v-row>
-                <v-col>
-                  <ais-stats>
-                    <p
-                      class="my-0"
-                      slot-scope="{
-                        hitsPerPage,
-                        nbPages,
-                        nbHits,
-                        page,
-                        processingTimeMS,
-                        query,
-                      }"
-                    >
-                      {{ $t('search_result') }}:{{ nbHits.toLocaleString() }} {{ $t('hits') }}
-                    </p>
-                  </ais-stats>
-                </v-col>
-                <v-col class="text-right">
-                  <ais-hits-per-page
-                    :items="[
-                      { label: '24', value: 24, default: true },
-                      { label: '60', value: 60 },
-                      { label: '120', value: 120 },
-                      { label: '512', value: 512 },
-                    ]"
-                  />
-                </v-col>
-              </v-row>
-            </v-sheet>
-
-            <ais-pagination :padding="2" class="my-4" />
-
-            <ais-hits>
-              <v-row slot-scope="{ items }">
-                <v-col
-                  v-for="item in items"
-                  :key="item.objectID"
-                  col="12"
-                  sm="3"
-                >
-                  <v-card flat outlined>
-                    <a
-                      :href="curationUrl(item)"
-                      target="_blank"
-                    >
-                      <v-img
-                        contain
-                        max-height="150"
-                        style="height: 150px"
-                        width="100%"
-                        class="grey lighten-2"
-                        :src="item.image"
-                      />
-                    </a>
-
-                    <v-card-text>
-                      <a
-                        :href="curationUrl(item)"
-                        target="_blank"
-                      >
-                        <h3 class="mb-4">{{item.vol}} {{ item.work }} {{item.page}}コマ目</h3>
-                      </a>
-
-                      <p>
-                      <ul>
-                        <template v-for="(tag, index) in item.label">
-                          <li v-if="item._snippetResult.label[index].matchLevel != 'none'" :key="tag">
-                            <ais-snippet
-                              :attribute="'label.'+index"
-                              :hit="item"
-                            />
-                          </li>
-                        </template>
-                      </ul>
-                      </p>
-                      
-                      <!--
-                      <p>
-                        <ais-snippet
-                          attribute="label2"
-                          :hit="item"
-                        />
-                      </p>
-                      -->
-
-                      <p>
-                        {{item.attribution}}
-                      </p>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-            </ais-hits>
-
-            <ais-pagination :padding="2" class="my-4" />
-          </v-col>
+          
         </v-row>
       </v-container>
     </ais-instant-search>

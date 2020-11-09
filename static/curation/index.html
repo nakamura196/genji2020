@@ -36,6 +36,9 @@
             if(vars["canvas"]){
               data.canvas = decodeURIComponent(vars["canvas"])
             }
+          } else if(vars["curation"]){
+            data.curation = decodeURIComponent(vars["curation"])
+            data.pos = decodeURIComponent(vars["pos"])
           }
 
           IIIFCurationViewerEmbedded({

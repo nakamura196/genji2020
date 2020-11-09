@@ -226,6 +226,11 @@ export default {
         ['@babel/plugin-proposal-class-properties', { loose: true }],
       ],
     },
+    extend (config, ctx) {
+      config.node = {
+        fs: "empty" 
+      }
+    }
   },
 
   ...routerBase,
@@ -233,36 +238,43 @@ export default {
   generate: {
     dir: 'docs',
     
-    /*
+    
     routes() {
 
       const fs = require('fs')
-      const jsonData = JSON.parse(fs.readFileSync('assets/json/algolia.json'))
-
-      const arr = jsonData
+      const jsonData = JSON.parse(fs.readFileSync('assets/json/nuxt.json'))
 
       const pages = []
 
-      for (let i = 0; i < arr.length; i++) {
-        
+      for(let id in jsonData){
 
-        const obj = arr[i]
+        const obj = jsonData[id]
 
-        const id = obj.objectID
+        const ids = obj.arr
+        const arr = []
+
+        for(let i = 0; i < ids.length; i++){
+          arr.push(jsonData[ids[i]])        
+        }
+
+        const result = {
+          item: obj,
+          arr : arr
+        }
 
         pages.push({
           route: `/item/${id}`,
-          payload : obj
+          payload : result
         })
 
         pages.push({
           route: `/en/item/${id}`,
-          payload : obj
+          payload : result
         })
       }
 
       return pages
     }
-    */
+    
   },
 }
