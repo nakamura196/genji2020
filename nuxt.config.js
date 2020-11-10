@@ -257,9 +257,9 @@ export default {
 
         for(let i = 0; i < sims.length; i++){
           const sim = sims[i]
-          const obj = jsonData[sim.id]
-          obj.score = sim.score
-          arr.push(obj)        
+          const tmp = JSON.parse(JSON.stringify(jsonData[sim.id]))
+          tmp.score = sim.score
+          arr.push(tmp)        
         }
 
         const result = {
