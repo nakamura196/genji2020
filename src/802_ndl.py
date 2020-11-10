@@ -64,6 +64,11 @@ for i in range(len(files)):
 
         image = m_data_map[manifest][canvas]
 
+        if page % 2 == 0:
+            image = image.replace("full", "pct:50,0,100,100")
+        else:
+            image = image.replace("full", "pct:0,0,50,100")
+
         obj[page] = {
             "attribution": "国立国会図書館",
             "label" : [],

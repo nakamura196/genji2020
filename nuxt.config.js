@@ -250,11 +250,16 @@ export default {
 
         const obj = jsonData[id]
 
-        const ids = obj.arr
+       
+        const sims = obj.arr
+        
         const arr = []
 
-        for(let i = 0; i < ids.length; i++){
-          arr.push(jsonData[ids[i]])        
+        for(let i = 0; i < sims.length; i++){
+          const sim = sims[i]
+          const obj = jsonData[sim.id]
+          obj.score = sim.score
+          arr.push(obj)        
         }
 
         const result = {

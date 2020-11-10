@@ -74,7 +74,8 @@ for attribution in map:
                     for id2 in obj2:
                         
                         text2 = obj2[id2]
-
+                        
+                        # ratio = 1 - Levenshtein.distance(text, text2) / max(len(text), len(text2)) * 1.00
                         ratio = Levenshtein.ratio(text, text2)
 
                         result[id][id2] = ratio
@@ -101,13 +102,13 @@ for id in result:
 
         obj2 = score_sorted[i]
 
-        '''
+        
         arr.append({
             "id" : obj2[0],
             "score" : obj2[1]
         })
-        '''
-        arr.append(obj2[0])
+        
+        # arr.append(obj2[0])
 
     all[id] = arr
 

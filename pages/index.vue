@@ -10,7 +10,7 @@
           <v-btn
             large
             class="mt-5"
-            :to="localePath({ name: 'search' })"
+            :to="localePath({ name: 'search', query : {'genji[sortBy]' : 'genji_page_asc'} })"
             color="primary"
             >{{ $t('try_out') }}</v-btn
           >

@@ -12,7 +12,7 @@
             </v-list-item-content>
           </v-list-item>
 
-          <v-list-item link :to="localePath({ name: 'search' })">
+          <v-list-item link :to="localePath({ name: 'search', query : {'genji[sortBy]' : 'genji_page_asc'} })">
             <v-list-item-action>
               <v-icon>mdi-magnify</v-icon>
             </v-list-item-action>

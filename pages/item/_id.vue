@@ -4,7 +4,7 @@
       <iframe
         :src="getIframeUrl()"
         width="100%"
-        height="600"
+        height="400"
         allowfullscreen
         frameborder="0"
       ></iframe>
@@ -72,7 +72,7 @@
 
           <dl class="row">
             <dt class="col-sm-3 text-muted"><b>URL</b></dt>
-            <dd class="col-sm-9">
+            <dd class="col-sm-9" style="overflow-wrap: break-word;">
               <a :href="prefix + '/item/' + $route.params.id">{{
                 prefix + '/item/' + $route.params.id
               }}</a>
@@ -85,7 +85,7 @@
             </dt>
             <dd class="col-sm-9">
               {{ result.item.vol }} {{ result.item.work }}
-              {{ result.item.page }}コマ目
+              {{ result.item.page }}{{result.item.attribution == "国立国会図書館" ? "ページ" : "コマ目"}}
             </dd>
           </dl>
 
@@ -135,26 +135,68 @@
             </dd>
           </dl>
 
+          <!--
           <dl class="row">
             <dt class="col-sm-3 text-muted">
               <b>{{ $t('テキスト') }}</b>
             </dt>
             <dd class="col-sm-9">
-              <p v-html="result.item.text.split('\n').join('<b> / </b>')"></p>
+              <v-expansion-panels tile :value="result.item.attribution == '国立国会図書館' ? 0 : 1">
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    {{result.item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                     <p v-html="result.item.text.split('\n').join('<b> / </b>')"></p>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
             </dd>
           </dl>
-          
-      <h3 class="mb-4">類似コマ</h3>
+          -->
 
+          <v-expansion-panels tile :value="result.item.attribution == '国立国会図書館' ? 0 : 1">
+                <v-expansion-panel class="my-4">
+                  <v-expansion-panel-header>
+                    {{result.item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
+                    <span v-if='result.item.attribution != "国立国会図書館"' class="red--text">（誤読を含む）</span>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                     <p 
+                     @blur="selected"
+                     @keyup="selected"
+                     @click="selected"　@select="selected" v-html="result.item.text.split('\n').join('<b> / </b>')"></p>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+
+              <v-sheet class="pa-4 my-4" color="grey lighten-3">
+
+              <v-row dense>
+                <v-col cols="12" :sm="3"><h3>類似コマ</h3></v-col>
+                <v-col cols="12" :sm="9"><v-select
+          v-model="select"
+          :items="items"
+          :label="$t('attribution')"
+        ></v-select></v-col>
+              </v-row>
+
+              </v-sheet>
+          
+      
+
+      
+
+      <template v-for="(item, index) in result.arr">
       <v-card
         class="mb-5"
         flat
         outlined
-        v-for="(item, index) in result.arr"
+        v-if="select == 'すべて' || item.attribution == select"
         :key="index"
       >
         <v-row>
-          <v-col cos="12" sm="3">
+          <v-col cols="12" sm="3">
             <nuxt-link
               :to="
                 localePath({ name: 'item-id', params: { id: item.objectID } })
@@ -167,28 +209,80 @@
                 width="100%"
               ></v-img>
             </nuxt-link>
-            <v-card-text>
+            <v-card-text class="text-center">
               <nuxt-link :to="localePath({name : 'item-id', params : {id : item.objectID}})" class="mr-2">
-                <h3>{{ item.vol }} {{ item.work }} {{ item.page }}コマ目</h3>
+                <h3>{{ item.vol }} {{ item.work }} {{ item.page }}{{item.attribution == "国立国会図書館" ? "ページ" : "コマ目"}}</h3>
               </nuxt-link>
 
               <p>
                 {{ item.attribution }}
               </p>
+
+              <v-progress-linear
+            :value="item.score * 100"
+            height="25"
+          >
+            類似度: <strong>{{ Math.ceil(item.score * 100) }}%</strong>
+          </v-progress-linear>
             </v-card-text>
           </v-col>
-          <v-col>
+          
+          <v-col　cols="12" sm="9">
             <v-card-text>
-              <p v-html="item.text.split('\n').join('<b> / </b>')"></p>
+              <v-expansion-panels tile :value="item.attribution == '国立国会図書館' ? 0 : 1">
+                <v-expansion-panel>
+                  <v-expansion-panel-header>
+                    {{item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
+                    <span v-if='item.attribution != "国立国会図書館"' class="red--text">（誤読を含む）</span>
+                  </v-expansion-panel-header>
+                  <v-expansion-panel-content>
+                    <p>
+                      <template v-for="(text, index) in item.label">
+                        <span v-if="index == item.highlight && selectedText != ''" class="background-color : yellow lighten-3">
+                          {{text}}
+                        </span>
+                        <span v-else>
+                          {{text}}
+                        </span>
+                        <b v-if="index != item.label.length - 1"> / </b>
+                      </template>
+                    </p>
+
+                    <template v-if="selectedText != ''"><b>選択済みテキスト：</b>{{selectedText}}</template>
+                  </v-expansion-panel-content>
+                </v-expansion-panel>
+              </v-expansion-panels>
+              
             </v-card-text>
           </v-col>
         </v-row>
       </v-card>
+      </template>
     </v-container>
   </div>
 </template>
 
 <script>
+
+function levenshteinDistance(str1, str2) {
+  var r, c, cost, 
+      d = [];
+
+  for (r=0; r<=str1.length; r++) {
+    d[r] = [r];
+  }
+  for (c=0; c<=str2.length; c++) {
+    d[0][c] = c;
+  }
+  for (r=1; r<=str1.length; r++) {
+    for (c=1; c<=str2.length; c++) {
+      //cost = str1[r-1] == str2[c-1] ? 0: 1;
+      cost = str1.charCodeAt(r-1) == str2.charCodeAt(c-1) ? 0: 1;
+      d[r][c] = Math.min(d[r-1][c]+1, d[r][c-1]+1, d[r-1][c-1]+cost);
+    }
+  }
+  return d[str1.length][str2.length] / Math.max(str1.length, str2.length);
+}
 
 const fs = require('fs')
 
@@ -235,11 +329,14 @@ export default {
 
       */
 
-      const ids = obj.arr
+      const sims = obj.arr
       const arr = []
 
-      for(let i = 0; i < ids.length; i++){
-        arr.push(jsonData[ids[i]])        
+      for(let i = 0; i < sims.length; i++){
+        const sim = sims[i]
+        const obj = jsonData[sim.id]
+        obj.score = sim.score
+        arr.push(obj)        
       }
 
       let result = {
@@ -255,6 +352,8 @@ export default {
     return {
       baseUrl: process.env.BASE_URL,
       prefix: process.env.BASE_URL, //'https://w3id.org/kunshujo',
+      select: "すべて",
+      selectedText: ""
     }
   },
 
@@ -271,6 +370,58 @@ export default {
       return null
       //return this.result.title
     },
+    items(){
+      const arr = this.result.arr
+      const items = ["すべて"]
+      for(let i = 0; i < arr.length; i++){
+
+        const attribution = arr[i].attribution
+        if(!items.includes(attribution)){
+          items.push(attribution)
+        }
+      }
+      return items
+    }
+  },
+
+  watch: {
+    selectedText: function(){
+      const selectedText = this.selectedText
+
+      const arr = this.result.arr
+      const items = []
+      for(let i = 0; i < arr.length; i++){
+        const item = arr[i]
+        const texts = item.label
+        const map = {}
+        for(let j = 0; j < texts.length; j++){
+          let text = texts[j]
+
+          /*
+          if(j != texts.length - 1 && text.length < 5){
+            text += texts[j + 1]
+          }
+          */
+
+          const dist = levenshteinDistance(selectedText, text)
+
+          map[j] = dist
+        }
+        
+        const arr2 = Object.keys(map).map((e)=>({ key: e, value: map[e] }));
+        arr2.sort(function(a,b){
+          if(a.value < b.value) return -1;
+          if(a.value > b.value) return 1;
+          return 0;
+        });
+        
+        item.highlight = arr2[0].key
+
+        items.push(item)
+      }
+
+      this.result.arr = items
+    }
   },
 
   methods: {
@@ -288,6 +439,10 @@ export default {
         '/curation/?curation=' + item.curation + "&pos=" + item.pos
       }
       return url
+    },
+
+    selected: function() {
+        this.selectedText = window.getSelection().toString();
     },
 
     getCurationUrl() {
