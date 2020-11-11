@@ -159,7 +159,6 @@
                 <v-expansion-panel class="my-4">
                   <v-expansion-panel-header>
                     {{result.item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
-                    <span v-if='result.item.attribution != "国立国会図書館"' class="red--text">（誤読を含む）</span>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content>
                      <p 
@@ -233,7 +232,6 @@
                 <v-expansion-panel>
                   <v-expansion-panel-header>
                     {{item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
-                    <span v-if='item.attribution != "国立国会図書館"' class="red--text">（誤読を含む）</span>
                   </v-expansion-panel-header>
                   <v-expansion-panel-content>
                     <p>
