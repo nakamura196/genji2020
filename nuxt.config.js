@@ -3,11 +3,6 @@ import colors from 'vuetify/es5/util/colors'
 const environment = process.env.NODE_ENV || 'local'
 const env = require(`./env/${environment}.ts`)
 
-//const fs = require('fs')
-//const jsonData = JSON.parse(fs.readFileSync('assets/json/algolia.json'))
-//env.jsonData = jsonData
-
-// `DEPLOY_ENV` が `GH_PAGES` の場合のみ `router.base = '/<repository-name>/'` を追加する
 const routerBase =
   process.env.DEPLOY_ENV === 'GH_PAGES'
     ? {
@@ -38,15 +33,17 @@ const ogpImages = basePath + 'img/ogp/' // cdnPath + 'img/ogp/'
 // pwa
 const shortName = "dgenji"
 const manifestIcon = 'img/icons/icon-512.png'
-// const splashscreens = cdnPath + 'img/splashscreens/'
 
 export default {
+  // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
+  ssr: false,
+
   // Target (https://go.nuxtjs.dev/config-target)
   target: 'static',
-  // srcDir: 'src/',
 
   env,
 
+  // Global page headers (https://go.nuxtjs.dev/config-head)
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
     htmlAttrs: {
@@ -144,7 +141,8 @@ export default {
   loading: { color: '#E64A19', height: '5px' },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
-  css: [],
+  css: [
+  ],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [{ src: '~/plugins/init-client'}],
@@ -167,15 +165,13 @@ export default {
     // https://go.nuxtjs.dev/pwa
     '@nuxtjs/pwa',
     '@nuxtjs/sitemap',
+    'nuxt-i18n',
     [
       '@nuxtjs/google-analytics',
       {
         id: GOOGLE_ANALYTICS_ID,
       },
     ],
-    'nuxt-i18n',
-    // Simple usage
-    // '@nuxtjs/amp',
   ],
 
   sitemap: {
@@ -219,67 +215,17 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {
-    standalone: true, // これを追加！
     babel: {
       plugins: [
         ['@babel/plugin-proposal-decorators', { legacy: true }],
         ['@babel/plugin-proposal-class-properties', { loose: true }],
       ],
     },
-    extend (config, ctx) {
-      config.node = {
-        fs: "empty" 
-      }
-    }
   },
 
   ...routerBase,
 
   generate: {
-    dir: 'docs',
-    
-    
-    routes() {
-
-      const fs = require('fs')
-      const jsonData = JSON.parse(fs.readFileSync('assets/json/nuxt.json'))
-
-      const pages = []
-
-      for(let id in jsonData){
-
-        const obj = jsonData[id]
-
-       
-        const sims = obj.arr
-        
-        const arr = []
-
-        for(let i = 0; i < sims.length; i++){
-          const sim = sims[i]
-          const tmp = JSON.parse(JSON.stringify(jsonData[sim.id]))
-          tmp.score = sim.score
-          arr.push(tmp)        
-        }
-
-        const result = {
-          item: obj,
-          arr : arr
-        }
-
-        pages.push({
-          route: `/item/${id}`,
-          payload : result
-        })
-
-        pages.push({
-          route: `/en/item/${id}`,
-          payload : result
-        })
-      }
-
-      return pages
-    }
-    
-  },
+    dir: 'docs'
+  }
 }

@@ -10,7 +10,7 @@
       ></iframe>
     </v-container>
     <v-container>
-      <p class="text-center">
+      <div class="text-center">
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-btn
@@ -68,7 +68,12 @@
           </template>
           <span>{{ 'Pocket' }}</span>
         </v-tooltip>
-      </p>
+
+        <p class="my-4">
+          <v-btn class="ma-1" :to="localePath({name : 'item-id', params : {id : ( '0000' + (Number(result.item.objectID) - 1) ).slice(-4)}})"><v-icon>mdi-chevron-left</v-icon></v-btn>
+          <v-btn class="ma-1" :to="localePath({name : 'item-id', params : {id : ( '0000' + (Number(result.item.objectID) + 1) ).slice(-4)}})"><v-icon>mdi-chevron-right</v-icon></v-btn>
+          </p>
+      </div>
 
           <dl class="row">
             <dt class="col-sm-3 text-muted"><b>URL</b></dt>
@@ -169,6 +174,24 @@
                 </v-expansion-panel>
               </v-expansion-panels>
 
+              <template v-if="chips.length > 0  && isSignedIn">
+                <dl class="row">
+            <dt class="col-sm-3 text-muted">
+              <b>番号付与済み</b>
+            </dt>
+            <dd class="col-sm-9">
+              <v-chip
+      v-for="(attribution, index) in chips"
+      :key="'chip_'+index"
+      class="mx-2"
+    >
+      {{attribution}}
+    </v-chip>
+            </dd>
+          </dl>
+                
+              </template>
+
               <v-sheet class="pa-4 my-4" color="grey lighten-3">
 
               <v-row dense>
@@ -208,7 +231,9 @@
                 width="100%"
               ></v-img>
             </nuxt-link>
-            <v-card-text class="text-center">
+            <v-card-text>
+
+              <div class="text-center">
               <nuxt-link :to="localePath({name : 'item-id', params : {id : item.objectID}})" class="mr-2">
                 <h3>{{ item.vol }} {{ item.work }} {{ item.page }}{{item.attribution == "国立国会図書館" ? "ページ" : "コマ目"}}</h3>
               </nuxt-link>
@@ -223,35 +248,83 @@
           >
             類似度: <strong>{{ Math.ceil(item.score * 100) }}%</strong>
           </v-progress-linear>
+
+          </div>
+
+          <template v-if="selectedText != ''"><p class="mt-4"><b>選択済みテキスト：</b>{{selectedText}}</p></template>
+            
+              <p class="mt-4" v-if="isSignedIn"><v-btn color="primary" @click="update2(item.objectID)">{{$t("update")}}</v-btn></p>
             </v-card-text>
+
+            
           </v-col>
           
           <v-col　cols="12" sm="9">
-            <v-card-text>
-              <v-expansion-panels tile :value="item.attribution == '国立国会図書館' ? 0 : 1">
-                <v-expansion-panel>
-                  <v-expansion-panel-header>
-                    {{item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content>
-                    <p>
-                      <template v-for="(text, index) in item.label">
-                        <span v-if="index == item.highlight && selectedText != ''" class="background-color : yellow lighten-3">
-                          {{text}}
-                        </span>
-                        <span v-else>
-                          {{text}}
-                        </span>
-                        <b v-if="index != item.label.length - 1"> / </b>
-                      </template>
-                    </p>
 
-                    <template v-if="selectedText != ''"><b>選択済みテキスト：</b>{{selectedText}}</template>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-expansion-panels>
+            <template v-if="isSignedIn && result.item.attribution == '国立国会図書館'">
+
+              <v-virtual-scroll
+        :items="item.label"
+        height="500"
+        item-height="30"
+      >
+        <template v-slot:default="{ item : text, index }">
+          <v-list-item :key="index">
+            
+            
+            <v-list-item-content>
+              <v-checkbox
+                  v-model="checkbox[item.objectID]"
+                  :value="index"
+                  dense
+                  class="my-0 py-0"
+                >
+                <template slot='label'>
+                  <span v-if="index == item.highlight && selectedText != ''" class="background-color : yellow lighten-3">
+                    {{text}}
+                  </span>
+                  <span v-else>
+                    {{text}}
+                  </span>
+                </template>
+                </v-checkbox>
+            </v-list-item-content>
+            
+          </v-list-item>
+        </template>
+      </v-virtual-scroll>
+
+
               
-            </v-card-text>
+            
+            </template>
+            <template v-else>
+              <v-card-text>
+                <v-expansion-panels tile :value="item.attribution == '国立国会図書館' ? 0 : 1">
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      {{item.attribution == "国立国会図書館" ? "テキスト" : "OCRテキスト"}}
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <p>
+                        <template v-for="(text, index) in item.label">
+                          <span v-if="index == item.highlight && selectedText != ''" class="background-color : yellow lighten-3">
+                            {{text}}
+                          </span>
+                          <span v-else>
+                            {{text}}
+                          </span>
+                          <b v-if="index != item.label.length - 1"> / </b>
+                        </template>
+                      </p>
+
+                      <template v-if="selectedText != ''"><b>選択済みテキスト：</b>{{selectedText}}</template>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+                
+              </v-card-text>
+            </template>
           </v-col>
         </v-row>
       </v-card>
@@ -261,6 +334,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+import firebase from "firebase";
 
 function levenshteinDistance(str1, str2) {
   var r, c, cost, 
@@ -282,8 +357,6 @@ function levenshteinDistance(str1, str2) {
   return d[str1.length][str2.length] / Math.max(str1.length, str2.length);
 }
 
-const fs = require('fs')
-
 export default {
   async asyncData({ payload, app }) {
     if (payload) {
@@ -291,8 +364,8 @@ export default {
     } else {
       const id = app.context.params.id
 
-      
-      const jsonData = JSON.parse(fs.readFileSync('assets/json/nuxt.json'))
+      const res = await axios.get('/nuxt.json')
+      const jsonData = res.data
 
       /*
 
@@ -351,8 +424,48 @@ export default {
       baseUrl: process.env.BASE_URL,
       prefix: process.env.BASE_URL, //'https://w3id.org/kunshujo',
       select: "すべて",
-      selectedText: ""
+      selectedText: "",
+      isSignedIn: false,
+      checkbox: {}
     }
+  },
+
+  created() {
+    this.onAuthStateChanged();
+
+    const checkbox = {}
+    
+    const arr = this.result.arr
+    for(let i = 0; i < arr.length; i++){
+      checkbox[arr[i].objectID] = []
+    }
+    
+
+    
+
+    const db = firebase.firestore();
+
+    const numberRef = db.collection(this.result.item.objectID);
+
+    if(numberRef){
+      numberRef
+      .get()
+      .then(res => {
+
+        res.forEach(doc => {
+          checkbox[doc.id] = Array.isArray(doc.data().values) ? doc.data().values : [doc.data().values]
+        });
+
+        this.checkbox = checkbox
+      })
+      .catch(error => {
+        console.log("error : " + error);
+      });
+    } else {
+      this.checkbox = checkbox
+    }
+
+
   },
 
   computed: {
@@ -379,6 +492,19 @@ export default {
         }
       }
       return items
+    },
+    chips(){
+      const arr = this.result.arr
+      const chips = []
+      const checkbox = this.checkbox
+      for(let i = 0; i < arr.length; i++){
+        const item = arr[i]
+        const id = item.objectID
+        if(checkbox[id] && checkbox[id].length > 0){
+          chips.push(item.attribution)
+        }
+      }
+      return chips
     }
   },
 
@@ -423,6 +549,13 @@ export default {
   },
 
   methods: {
+    onAuthStateChanged() {
+      firebase.auth().onAuthStateChanged(user => {
+        this.userName = user ? user.displayName : null;
+        this.userPic = user ? user.photoURL : null;
+        this.isSignedIn = user ? true : false;
+      });
+    },
     getIframeUrl() {
       const item = this.result.item
       let url = ""
@@ -457,6 +590,28 @@ export default {
     aaa(item) {
       console.log(item)
     },
+
+    update2(data){
+      const id = data
+      const values = this.checkbox[data]
+      const parent = this.result.item.objectID
+      this.$store.dispatch('addNumber', {id, values, parent})
+    },
+
+    toArray2(map){
+      const arr = []
+      for(let key in map){
+        arr.push({
+          key : key,
+          text : map[key]
+        })
+      }
+
+      console.log(arr)
+
+      return arr
+    }
+   
   },
 
   head() {

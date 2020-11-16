@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/en/legend", {data:[{}],fetch:[],mutations:void 0});

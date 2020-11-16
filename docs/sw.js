@@ -1,4 +1,4 @@
-const options = {"workboxURL":"https://cdn.jsdelivr.net/npm/workbox-cdn@5.1.3/workbox/workbox-sw.js","importScripts":[],"config":{"debug":false},"clientsClaim":true,"skipWaiting":true,"cleanupOutdatedCaches":true,"offlineAnalytics":false,"preCaching":[],"runtimeCaching":[{"urlPattern":"/genji2020/_nuxt/","handler":"CacheFirst","method":"GET","strategyPlugins":[]},{"urlPattern":"/genji2020/","handler":"NetworkFirst","method":"GET","strategyPlugins":[]}],"offlinePage":null,"pagesURLPattern":"/genji2020/","offlineStrategy":"NetworkFirst"}
+const options = {"workboxURL":"https://cdn.jsdelivr.net/npm/workbox-cdn@5.1.3/workbox/workbox-sw.js","importScripts":[],"config":{"debug":false},"clientsClaim":true,"skipWaiting":true,"cleanupOutdatedCaches":true,"offlineAnalytics":false,"preCaching":["/genji2020/?standalone=true","/genji2020/?standalone=true"],"runtimeCaching":[{"urlPattern":"/genji2020/_nuxt/","handler":"CacheFirst","method":"GET","strategyPlugins":[]},{"urlPattern":"/genji2020/","handler":"NetworkFirst","method":"GET","strategyPlugins":[]},{"urlPattern":"/genji2020/_nuxt/","handler":"CacheFirst","method":"GET","strategyPlugins":[]},{"urlPattern":"/genji2020/","handler":"NetworkFirst","method":"GET","strategyPlugins":[]}],"offlinePage":null,"pagesURLPattern":"/genji2020/","offlineStrategy":"NetworkFirst"}
 
 importScripts(...[options.workboxURL, ...options.importScripts])
 
@@ -79,10 +79,13 @@ function offlinePage(workbox, options) {
 }
 
 function workboxExtensions(workbox, options) {
+  
 }
 
 function cachingExtensions(workbox, options) {
+  
 }
 
 function routingExtensions(workbox, options) {
+  
 }

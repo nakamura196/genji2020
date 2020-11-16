@@ -235,8 +235,8 @@ export default {
   data() {
     return {
       searchClient: algoliasearch(
-        'X6NDGPNEKY',
-        '6eb95994e7c070f22d01ed808eb2c081'
+        '48L2134NJ6',
+        '713961b75d7d86355a810e6175e42d75'
       ),
       routing: {
         stateMapping: simple(),
