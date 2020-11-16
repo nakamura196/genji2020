@@ -330,6 +330,25 @@
       </v-card>
       </template>
     </v-container>
+
+    <v-dialog v-model="dialog" width="500">
+      <v-card>
+        <!--
+        <v-card-title class="headline grey lighten-2" primary-title
+          >プロフィールを編集</v-card-title
+        >
+        -->
+
+        <v-card-text class="pt-5"
+          >更新しました。</v-card-text
+        >
+
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn color="primary">閉じる</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -364,7 +383,7 @@ export default {
     } else {
       const id = app.context.params.id
 
-      const res = await axios.get('/nuxt.json')
+      const res = await axios.get(app.context.env.BASE_URL + '/nuxt.json')
       const jsonData = res.data
 
       /*
@@ -426,7 +445,8 @@ export default {
       select: "すべて",
       selectedText: "",
       isSignedIn: false,
-      checkbox: {}
+      checkbox: {},
+      dialog : true,
     }
   },
 
@@ -596,6 +616,7 @@ export default {
       const values = this.checkbox[data]
       const parent = this.result.item.objectID
       this.$store.dispatch('addNumber', {id, values, parent})
+      this.dialog = true
     },
 
     toArray2(map){
