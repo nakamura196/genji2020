@@ -179,17 +179,18 @@
         >
 
         <v-card-text class="mt-5">
-          ログインにはGoogleまたはTwitterアカウントが必要です。
+          ログインにはGoogle<!--またはTwitter-->アカウントが必要です。
           <div class="text-center mb-5">
             <v-btn class="error mt-5" @click="signInWithGoogle">
               <v-icon class="mr-2">mdi mdi-google</v-icon
               >Googleアカウントでログイン
             </v-btn>
-
+            <!--
             <v-btn class="info mt-5" @click="signInWithTwitter">
               <v-icon class="mr-2">mdi mdi-twitter</v-icon
               >Twitterアカウントでログイン
             </v-btn>
+            -->
           </div>
         </v-card-text>
       </v-card>

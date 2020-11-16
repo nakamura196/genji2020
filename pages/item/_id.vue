@@ -345,7 +345,7 @@
 
         <v-card-actions>
           <v-spacer/>
-          <v-btn color="primary">閉じる</v-btn>
+          <v-btn color="primary" @click="dialog = !dialog">閉じる</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -446,7 +446,7 @@ export default {
       selectedText: "",
       isSignedIn: false,
       checkbox: {},
-      dialog : true,
+      dialog : false,
     }
   },
 
