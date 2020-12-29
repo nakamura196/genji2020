@@ -86,7 +86,7 @@
             "
             style="color: inherit; text-decoration: inherit"
           >
-            {{ $t("digital_genji") }}
+            {{ $t(siteName) }}
           </nuxt-link>
         </v-toolbar-title>
 
@@ -148,8 +148,8 @@
     <v-footer :dark="true" class="mt-5">
       <v-container>
         <p class="text-center my-5">
-          <template v-if="$i18n.locale == 'ja'"> 東京大学</template>
-          <template v-else>The University of Tokyo </template>
+          <template v-if="$i18n.locale == 'ja'">裏源氏勉強会</template>
+          <template v-else>裏源氏勉強会</template>
         </p>
       </v-container>
     </v-footer>
@@ -195,6 +195,21 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <v-btn
+      v-show="fab"
+      v-scroll="onScroll"
+      fab
+      dark
+      fixed
+      bottom
+      right
+      large
+      color="error"
+      @click="toTop"
+    >
+      <v-icon>mdi-arrow-up</v-icon>
+    </v-btn>
   </v-app>
 </template>
 
@@ -206,8 +221,11 @@ import firebase from "../plugins/firebase";
   components: {}
 })
 export default class search extends Vue {
+  fab: boolean = false
+
   drawer: boolean = false;
   baseUrl: string = process.env.BASE_URL || "";
+  siteName: string = process.env.siteName || "";
 
   //isSignedIn: boolean = false;
   userName: any = null;
@@ -225,6 +243,17 @@ export default class search extends Vue {
 
   created() {
     this.onAuthStateChanged();
+  }
+
+  onScroll(e: any): void {
+    if (typeof window === 'undefined') return
+    const top = window.pageYOffset || e.target.scrollTop || 0
+    this.fab = top > 20
+  }
+
+  toTop(): void {
+    // @ts-ignore
+    this.$vuetify.goTo(0)
   }
 
   signInWithGoogle() {

@@ -8,7 +8,49 @@ import glob
 import hashlib
 import requests
 
+config = requests.get("https://genji.dl.itc.u-tokyo.ac.jp/data/info.json").json()
 
+selections = config["selections"]
+
+config_map = {}
+
+for selection in selections:
+    members = selection["members"]
+
+    for member in members:
+        label = member["label"]
+
+        for m in member["metadata"]:
+            if m["label"] == "vol":
+                config_map[m["value"]] = label
+
+koui = {}
+for vol in range(1, 55):
+    print("curation download", vol, 54)
+    koui_url = "https://genji.dl.itc.u-tokyo.ac.jp/data/vol/"+str(vol).zfill(2)+"/curation.json"
+    k = requests.get(koui_url).json()
+
+    
+
+    selections = k["selections"]
+
+    for selection in selections:
+        for member in selection["members"]:
+            member_id = member["@id"]
+            labels = member["label"].split(" ")
+            if labels[0] == "校異源氏物語":
+                page = int(labels[1].split("p.")[1])
+                if page not in koui:
+                    koui[page] = []
+
+                member_id_spl = member_id.split("#xywh=")
+
+                canvasId = member_id_spl[0]
+
+                hash = hashlib.md5(canvasId.encode('utf-8')).hexdigest()
+                if hash not in koui[page]:
+
+                    koui[page].append(hash)
 
 path = "/Users/nakamurasatoru/git/d_genji/kouigenjimonogatari.github.io/api/items/*.json"
 
@@ -71,16 +113,22 @@ for i in range(len(files)):
 
         obj[page] = {
             "attribution": "国立国会図書館",
+            "target" : "校異源氏物語",
             "label" : [],
             "objectID" : hash,
             "page": page,
             # "pos": 1,
             "vol": vol,
+            "vol_str" : '{} {}'.format(str(vol).zfill(2), config_map[vol]),
             "work": rdf2["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"],
             "image" : image,
             "manifest" : manifest,
-            "canvas" : canvas
+            "canvas" : canvas,
+            "type" : "ページ"
         }
+
+        if page in koui:
+            obj[page]["koui"] = koui[page]
 
     obj2 = obj[page]
 

@@ -20,33 +20,45 @@ for file in files:
     with open(file) as f:
         al = json.load(f)
 
-    for obj in al:
+    for i in range(len(al)):
+        obj = al[i]
+        # for obj in al:
+        
+        if i != 0:
+            obj["prev"] = al[i-1]["objectID"]
+
+        if i < len(al) - 1:
+            obj["next"] = al[i+1]["objectID"]
+
         id = obj["objectID"]
 
         all2[id] = obj
 
 
-with open("calc.json") as f:
+with open("calc2.json") as f:
     all = json.load(f)
 
-arr2 = []
-arr3 = {}
+algolia = []
+nuxt = {}
 
 
 for id in all2:
-    arr2.append(all2[id])
+    obj = all2[id]
 
-    all2[id]["arr"] = all[id]
-    arr3[id] = all2[id]
+    if obj["target"] == "校異源氏物語":
+        algolia.append(obj)
+
+    obj["arr"] = all[id]
+    nuxt[id] = obj
 
 opath = "algolia.json"
 
 with open(opath, 'w') as outfile:
-    json.dump(arr2, outfile, ensure_ascii=False,
+    json.dump(algolia, outfile, ensure_ascii=False,
             indent=4, sort_keys=True, separators=(',', ': '))
 
 opath = "nuxt.json"
 
 with open(opath, 'w') as outfile:
-    json.dump(arr3, outfile, ensure_ascii=False,
+    json.dump(nuxt, outfile, ensure_ascii=False,
             indent=4, sort_keys=True, separators=(',', ': '))

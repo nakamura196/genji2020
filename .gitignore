@@ -81,12 +81,10 @@ dist
 .idea
 
 # Service worker
-# sw.*
+sw.*
 
 # macOS
 .DS_Store
 
 # Vim swap files
 *.swp
-
-.DS_Store

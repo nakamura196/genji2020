@@ -4,7 +4,7 @@
       <v-parallax src="img/ogp/home.jpg" height="300">
         <v-layout column align-center justify-center class="white--text">
           <h1 class="white--text mb-2 display-1 text-center">
-            <b>{{$t("digital_genji")}}
+            <b>{{$t(siteName)}}
             </b>
           </h1>
           <v-btn
@@ -25,7 +25,7 @@
         </v-card-title>
         <v-card-text>
           <div class="text--primary">
-            <p>{{$t("digital_genji")}}</p>
+            <p>{{$t(siteName)}}</p>
           </div>
         </v-card-text>
       </v-card>
@@ -38,6 +38,7 @@ export default {
   data() {
     return {
       baseUrl: process.env.BASE_URL,
+      siteName: process.env.siteName
     }
   },
   head() {

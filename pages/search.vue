@@ -112,10 +112,8 @@
                       <nuxt-link
                         :to="localePath({name : 'item-id', params : {id : item.objectID}})"
                       >
-                        <h3 class="mb-4">{{item.vol}} {{ item.work }} {{item.page}}{{item.attribution == "国立国会図書館" ? "ページ" : "コマ目"}}</h3>
+                        <h3 class="mb-4">{{item.vol_str}}  {{item.page}}{{$t(item.type)}}</h3>
                       </nuxt-link>
-                      
-                      <!--  {{aaa(item)}} -->
 
                       <p v-if="item._snippetResult.text && item._snippetResult.text.matchLevel != 'none'">
                         
@@ -137,19 +135,6 @@
                           </template>
                         </ul>
                       </p>
-                      
-                      <!--
-                      <p>
-                        <ais-snippet
-                          attribute="label2"
-                          :hit="item"
-                        />
-                      </p>
-                      -->
-
-                      <p>
-                        {{item.attribution}}
-                      </p>
                     </v-card-text>
                   </v-card>
                 </v-col>
@@ -170,25 +155,10 @@
                 </ais-clear-refinements>
               </v-col>
             </v-row>
-            <v-card flat outlined class="mt-4">
-              <v-card-title class="headline grey lighten-2">
-                {{ $t('attribution') }}
-              </v-card-title>
-              <v-card-text>
-                <ais-refinement-list
-                  class="mt-4"
-                  show-more
-                  operator="and"
-                  :show-more-limit="100"
-                  :limit="20"
-                  attribute="attribution"
-                />
-              </v-card-text>
-            </v-card>
 
             <v-card flat outlined class="mt-4">
               <v-card-title class="headline grey lighten-2">
-                {{ $t('work') }}
+                {{ $t('vol_str') }}
               </v-card-title>
               <v-card-text>
                 <ais-refinement-list
@@ -197,23 +167,7 @@
                   operator="and"
                   :show-more-limit="100"
                   :limit="20"
-                  attribute="work"
-                />
-              </v-card-text>
-            </v-card>
-
-            <v-card flat outlined class="mt-4">
-              <v-card-title class="headline grey lighten-2">
-                {{ $t('vol') }}
-              </v-card-title>
-              <v-card-text>
-                <ais-refinement-list
-                  class="mt-4"
-                  show-more
-                  operator="and"
-                  :show-more-limit="100"
-                  :limit="20"
-                  attribute="vol"
+                  attribute="vol_str"
                   :sort-by="['isRefined', 'name:asc']"
                 />
               </v-card-text>
@@ -253,9 +207,6 @@ export default {
   },
 
   methods: {
-    aaa(item){
-      console.log(item)
-    },
     bbb(items){
       const items2 = []
       for(let i = 0; i < items.length; i++){

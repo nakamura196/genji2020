@@ -24,7 +24,7 @@ for file in files:
     for obj in al:
         id = obj["objectID"]
         text = obj["text"]
-        attribution = obj["attribution"]
+        attribution = obj["target"]
         vol = obj["vol"]
 
         if attribution not in map:
@@ -51,7 +51,7 @@ for attribution in map:
 
         for id in obj:
 
-            print(id)
+            # print(id)
 
             result[id] = {}
 
@@ -61,7 +61,8 @@ for attribution in map:
                 if attribution == attribution2:
                     continue
 
-
+                if attribution2 not in result[id]:
+                    result[id][attribution2] = {}
 
                 vols2 = map[attribution2]
 
@@ -78,43 +79,50 @@ for attribution in map:
                         # ratio = 1 - Levenshtein.distance(text, text2) / max(len(text), len(text2)) * 1.00
                         ratio = Levenshtein.ratio(text, text2)
 
-                        result[id][id2] = ratio
+                        result[id][attribution2][id2] = ratio
 
         # break
 
 all = {}
 
 for id in result:
-    print(id, result[id])
+    # print(id, result[id])
 
-    obj = result[id]
+    obj3 = result[id]
 
-    arr = []
+    map = {}
+    all[id] = map
 
-    score_sorted = sorted(obj.items(), key=lambda x:x[1], reverse=True)
+    for attribution in obj3:
 
-    max = 20
+        obj = obj3[attribution]
 
-    if len(score_sorted) < max:
-        max = len(score_sorted)
+        arr = []
 
-    for i in range(0, max):
+        score_sorted = sorted(obj.items(), key=lambda x:x[1], reverse=True)
 
-        obj2 = score_sorted[i]
+        max = 10
 
-        
-        arr.append({
-            "id" : obj2[0],
-            "score" : obj2[1]
-        })
-        
-        # arr.append(obj2[0])
+        if len(score_sorted) < max:
+            max = len(score_sorted)
 
-    all[id] = arr
+        for i in range(0, max):
+
+            obj2 = score_sorted[i]
+
+            
+            arr.append({
+                "id" : obj2[0],
+                "score" : obj2[1]
+            })
+            
+            # arr.append(obj2[0])
+
+        map[attribution] = arr
 
     
 
-opath = "calc.json"
+opath = "calc2.json"
 
 with open(opath, 'w') as outfile:
     json.dump(all, outfile, ensure_ascii=False,

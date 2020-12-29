@@ -10,13 +10,42 @@ import requests
 
 data = []
 
+config = requests.get("https://genji.dl.itc.u-tokyo.ac.jp/data/info.json").json()
 
+selections = config["selections"]
+
+config_map = {}
+
+for selection in selections:
+    members = selection["members"]
+
+    for member in members:
+        label = member["label"]
+
+        for m in member["metadata"]:
+            if m["label"] == "vol":
+                config_map[m["value"]] = label
 
 for vol in range(1, 55):
 
     print(vol)
 
     index = 1
+
+    koui_url = "https://genji.dl.itc.u-tokyo.ac.jp/data/vol/"+str(vol).zfill(2)+"/curation.json"
+    k = requests.get(koui_url).json()
+
+    koui = {}
+
+    selections = k["selections"]
+
+    for selection in selections:
+        for member in selection["members"]:
+            member_id = member["@id"]
+            labels = member["label"].split(" ")
+            if labels[0] == "校異源氏物語":
+                koui[member_id] = labels[1].split("p.")[1].zfill(4)
+            
 
     path = "/Users/nakamurasatoru/git/d_genji/genji_curation/docs/iiif/kuronet/"+str(vol).zfill(2)+".json"
 
@@ -61,6 +90,8 @@ for vol in range(1, 55):
                 map[canvasId] = {
                     "objectID" : hash,
                     "attribution" : "東京大学",
+                    "target" : "東大本",
+                    "vol_str" : '{} {}'.format(str(vol).zfill(2), config_map[vol]),
                     "vol" : vol,
                     "label": [],
                     "image" : images[canvasId],
@@ -69,12 +100,17 @@ for vol in range(1, 55):
                     "pos" : index,
                     "curation" : curationUrl,
                     "manifest" : manifest,
-                    "canvas" : canvasId
+                    "canvas" : canvasId,
+                    "koui" : [],
+                    "type" : "コマ"
                 }
 
                 index += 1
 
             map[canvasId]["label"].append(member["label"])
+
+            if member_id in koui:
+                map[canvasId]["koui"].append(koui[member_id])
 
         for canvas in map:
 

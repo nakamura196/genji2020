@@ -21,9 +21,10 @@ const basePath = baseUrl + baseDir
 
 // meta
 const lang = 'ja'
-const siteName = 'デジタル源氏物語'
+const siteName = 'デジタル源氏物語（AI画像検索版）'
+env.siteName = siteName
 const siteDesc =
-  "デジタル源氏物語"
+  "デジタル源氏物語（AI画像検索版）"
 const siteKeywords = 'IIIF, 源氏物語'
 
 // images
@@ -226,6 +227,6 @@ export default {
   ...routerBase,
 
   generate: {
-    dir: 'docs'
+    //dir: 'docs'
   }
 }
