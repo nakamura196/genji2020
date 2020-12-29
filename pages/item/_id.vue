@@ -198,7 +198,7 @@
       </v-sheet>
 
       <template v-for="(arr, attr) in result.arr">
-        <div :key="attr" v-if="select == 'すべて' || attr == select">
+        <div :key="attr" v-if="(select == 'すべて' || attr == select) && items.includes(attr)">
           <h3 class="mb-3 mt-5">{{ attr }}</h3>
 
           <ul class="horizontal-list">
@@ -451,7 +451,10 @@ export default {
       const arr = this.result.arr
       const items = ['すべて']
       for (let key in arr) {
-        items.push(key)
+        if(arr[key].length > 0){
+          items.push(key)
+        }
+        
       }
       return items
     },
