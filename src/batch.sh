@@ -1,2 +1,2 @@
-python 900_calc.py
+python 902_calc_ndlOnly.py
 python 901_merge.py

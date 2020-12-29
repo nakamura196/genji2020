@@ -35,7 +35,7 @@ for file in files:
         all2[id] = obj
 
 
-with open("calc2.json") as f:
+with open("calc3.json") as f:
     all = json.load(f)
 
 algolia = []
@@ -47,8 +47,8 @@ for id in all2:
 
     if obj["target"] == "校異源氏物語":
         algolia.append(obj)
-
-    obj["arr"] = all[id]
+    
+    obj["arr"] = all[id] if id in all else {}
     nuxt[id] = obj
 
 opath = "algolia.json"

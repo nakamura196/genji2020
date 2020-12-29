@@ -444,8 +444,8 @@ export default {
       return this.$route.params.id
     },
     title() {
-      return null
-      // return this.result.title
+      const item = this.item
+      return item.vol_str + " " + item.page + item.type
     },
     items() {
       const arr = this.result.arr
