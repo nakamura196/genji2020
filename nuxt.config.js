@@ -52,7 +52,7 @@ export default {
       lang,
     },
     titleTemplate: `%s - ${siteName}`,
-    title: 'hpdb',
+    title: siteName,
     meta: [
       { charset: 'utf-8' },
       { 'http-equiv': 'x-ua-compatible', content: 'ie=edge' },
