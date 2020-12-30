@@ -232,7 +232,7 @@
                   ></v-img>
                 </nuxt-link>
                 -->
-                <a @click="rItemId = item.objectID; dialog = true">
+                <a @click="rItemId = item.objectID; lItemId = id; dialog = true">
                 <v-img
                   :src="item.image"
                   
@@ -244,7 +244,7 @@
                 </a>
 
                 <v-card-text>
-                  <a @click="rItemId = item.objectID; dialog = true">
+                  <a @click="rItemId = item.objectID; lItemId = id; dialog = true">
                     <b>
                       {{ item.vol_str }} {{ item.page
                       }}{{
@@ -323,29 +323,79 @@
           <v-row>
             <v-col>
 
-              <h3 class="mb-4">{{ item.vol_str }} {{ item.page
+            <v-card>
+            <v-card-title>
+              <h3>{{ lItem.vol_str }} {{ lItem.page
                       }}{{
-                        item.type
-                      }}（{{item.target}}）</h3>
+                        lItem.type
+                      }}（{{lItem.target}}）</h3>
+</v-card-title>
+<div class="pa-4">
+
+              
 
               <iframe
-                :src="getIframeUrl(result.item)"
+                :src="getIframeUrl(lItem)"
                 width="100%"
                 height="600"
                 allowfullscreen
                 frameborder="0"
               ></iframe>
 
+              <p class="my-2 text-center">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-if="lItem.prev"
+                class="ma-1"
+                @click="lItemId = lItem.prev"
+                v-on="on"
+                ><v-icon>mdi-chevron-left</v-icon></v-btn
+              >
+            </template>
+            <span>{{'前の' + 
+              lItem.type + "へ"
+            }}</span>
+          </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-if="lItem.next"
+                class="ma-1"
+                @click="lItemId = lItem.next"
+                v-on="on"
+                ><v-icon>mdi-chevron-right</v-icon></v-btn
+              >
+            </template>
+            <span>{{'次の' + 
+              lItem.type + "へ"
+            }}</span>
+          </v-tooltip>
+        </p>
+
               <p
                 class="mt-2"
-                v-html="result.item.text.split('\n').join('<b> / </b>')"
+                v-if="lItem.text"
+                v-html="lItem.text.split('\n').join('<b> / </b>')"
+                @select="selected"
+              @blur="selected"
+              @keyup="selected"
+              @click="selected"
               ></p>
+              </div>
+              </v-card>
             </v-col>
+
             <v-col>
-              <h3 class="mb-4">{{ rItem.vol_str }} {{ rItem.page
+            <v-card>
+            <v-card-title>
+              <h3>{{ rItem.vol_str }} {{ rItem.page
                       }}{{
                         rItem.type
                       }}（{{rItem.target}}）</h3>
+</v-card-title>
+<div class="pa-4">
 
               <iframe
                 :src="getIframeUrl(rItem)"
@@ -354,15 +404,72 @@
                 allowfullscreen
                 frameborder="0"
               ></iframe>
-              <p
+
+              <p class="my-2 text-center">
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-if="rItem.prev"
+                class="ma-1"
+                @click="rItemId = rItem.prev"
+                v-on="on"
+                ><v-icon>mdi-chevron-left</v-icon></v-btn
+              >
+            </template>
+            <span>{{'前の' + 
+              rItem.type + "へ"
+            }}</span>
+          </v-tooltip>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+              <v-btn
+                v-if="rItem.next"
+                class="ma-1"
+                @click="rItemId = rItem.next"
+                v-on="on"
+                ><v-icon>mdi-chevron-right</v-icon></v-btn
+              >
+            </template>
+            <span>{{'次の' + 
+              rItem.type + "へ"
+            }}</span>
+          </v-tooltip>
+        </p>
+
+        <p
                 class="mt-2"
-                v-html="rItem.text && rItem.text.split('\n').join('<b> / </b>')"
-              ></p>
+        <template v-for="(text, lineIndex) in rItem.label">
+                                <span
+                                  v-if="
+                                    lineIndex == highlight_line_index &&
+                                    selectedText != ''
+                                  "
+                                  :key="lineIndex"
+                                  class="background-color : yellow lighten-3"
+                                >
+                                  {{ text }}
+                                </span>
+                                <span v-else :key="lineIndex">
+                                  {{ text }}
+                                </span>
+                                <b
+                                  v-if="lineIndex != item.label.length - 1"
+                                  :key="'br-' + lineIndex"
+                                >
+                                  /
+                                </b>
+                              </template>
+                              </p>
+              
+
+              </div>
+              </v-card>
             </v-col>
           </v-row>
 
           <div class="text-center my-10">
-            <v-btn :to="localePath({name : 'item-id', params : {id : rItemId}})" large color="primary" class="mr-4">続きを見る</v-btn>
+            <!-- <v-btn :to="localePath({name : 'item-id', params : {id : rItemId}})" large color="primary" class="mr-4">続きを見る</v-btn> -->
 
             <v-btn v-if="checkLike()" icon color="pink" @click="like = !like">
               <v-icon class="mr-1">mdi-heart</v-icon>1
@@ -380,6 +487,32 @@
 <script>
 import axios from 'axios'
 import firebase from 'firebase'
+
+function levenshteinDistance(str1, str2) {
+  let r
+  let c
+  let cost
+  const d = []
+
+  for (r = 0; r <= str1.length; r++) {
+    d[r] = [r]
+  }
+  for (c = 0; c <= str2.length; c++) {
+    d[0][c] = c
+  }
+  for (r = 1; r <= str1.length; r++) {
+    for (c = 1; c <= str2.length; c++) {
+      // cost = str1[r-1] == str2[c-1] ? 0: 1;
+      cost = str1.charCodeAt(r - 1) === str2.charCodeAt(c - 1) ? 0 : 1
+      d[r][c] = Math.min(
+        d[r - 1][c] + 1,
+        d[r][c - 1] + 1,
+        d[r - 1][c - 1] + cost
+      )
+    }
+  }
+  return d[str1.length][str2.length] / Math.max(str1.length, str2.length)
+}
 
 export default {
   async asyncData({ payload, app }) {
@@ -430,7 +563,10 @@ export default {
       checkbox: {},
       like: true,
       dialog : false,
-      rItemId : ""
+      rItemId : "",
+      lItemId : "",
+      lText : "",
+      highlight_line_index : -1
     }
   },
 
@@ -459,11 +595,27 @@ export default {
       return items
     },
     rItem() {
-      const rItemId = this.rItemId
-      return this.nuxt[rItemId] || {}
+      const itemId = this.rItemId
+      
+      return this.nuxt[itemId] || {}
     },
+    lItem() {
+      const itemId = this.lItemId
+      this.selectedText = ""
+      return this.nuxt[itemId] || {}
+    },
+    
     item(){
       return this.result.item
+    }
+  },
+
+  watch: {
+    selectedText() {
+      this.update_highlight()
+    },
+    rItem(){
+      this.update_highlight()
     }
   },
 
@@ -504,6 +656,29 @@ export default {
   },
 
   methods: {
+    update_highlight(){
+      const selectedText = this.selectedText
+      const item = this.rItem
+      const texts = item.label
+      const map = {}
+      for (let j = 0; j < texts.length; j++) {
+        const text = texts[j]
+
+        const dist = levenshteinDistance(selectedText, text)
+
+        map[j] = dist
+      }
+
+      const arr2 = Object.keys(map).map((e) => ({ key: e, value: map[e] }))
+      arr2.sort(function (a, b) {
+        if (a.value < b.value) return -1
+        if (a.value > b.value) return 1
+        return 0
+      })
+
+      const highlight_line_index = arr2[0].key
+      this.highlight_line_index = highlight_line_index
+    },
     onAuthStateChanged() {
       firebase.auth().onAuthStateChanged((user) => {
         this.userName = user ? user.displayName : null
