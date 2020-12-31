@@ -104,7 +104,7 @@ for id in result:
 
         score_sorted = sorted(obj.items(), key=lambda x:x[1], reverse=True)
 
-        max = 10
+        max = 6
 
         if len(score_sorted) < max:
             max = len(score_sorted)

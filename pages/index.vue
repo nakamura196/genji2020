@@ -42,7 +42,7 @@ export default {
     }
   },
   head() {
-    const title = this.$t("digital_genji")
+    const title = this.$t(this.siteName)
     return {
       titleTemplate: null,
       title,
