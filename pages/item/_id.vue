@@ -16,9 +16,7 @@
         <v-expansion-panel class="my-4">
           <v-expansion-panel-header>
             {{
-              item.attribution == '国立国会図書館'
-                ? 'テキスト'
-                : 'OCRテキスト'
+              item.attribution == '国立国会図書館' ? 'テキスト' : 'OCRテキスト'
             }}
           </v-expansion-panel-header>
           <v-expansion-panel-content>
@@ -109,9 +107,7 @@
                 ><v-icon>mdi-chevron-left</v-icon></v-btn
               >
             </template>
-            <span>{{'前の' + 
-              item.type + "へ"
-            }}</span>
+            <span>{{ '前の' + item.type + 'へ' }}</span>
           </v-tooltip>
 
           <v-tooltip bottom>
@@ -129,9 +125,7 @@
                 ><v-icon>mdi-chevron-right</v-icon></v-btn
               >
             </template>
-            <span>{{'次の' + 
-              item.type + "へ"
-            }}</span>
+            <span>{{ '次の' + item.type + 'へ' }}</span>
           </v-tooltip>
         </p>
       </div>
@@ -153,10 +147,7 @@
             <b>{{ $t('title') }}</b>
           </dt>
           <dd class="col-sm-9">
-            {{ item.vol_str }} {{ item.page
-            }}{{
-              item.type
-            }}
+            {{ item.vol_str }} {{ item.page }}{{ item.type }}
           </dd>
         </dl>
 
@@ -198,7 +189,10 @@
       </v-sheet>
 
       <template v-for="(arr, attr) in result.arr">
-        <div :key="attr" v-if="(select == 'すべて' || attr == select) && items.includes(attr)">
+        <div
+          :key="attr"
+          v-if="(select == 'すべて' || attr == select) && items.includes(attr)"
+        >
           <h3 class="mb-3 mt-5">{{ attr }}</h3>
 
           <ul class="horizontal-list">
@@ -232,25 +226,31 @@
                   ></v-img>
                 </nuxt-link>
                 -->
-                <a @click="rItemId = item.objectID; lItemId = id; dialog = true">
-                <v-img
-                  :src="item.image"
-                  
-                  contain
-                  style="height: 150px"
-                  width="100%"
-                  class="grey lighten-2"
-                ></v-img>
+                <a
+                  @click="
+                    rItemId = item.objectID
+                    lItemId = id
+                    dialog = true
+                  "
+                >
+                  <v-img
+                    :src="item.image"
+                    contain
+                    style="height: 150px"
+                    width="100%"
+                    class="grey lighten-2"
+                  ></v-img>
                 </a>
 
                 <v-card-text>
-                  <a @click="rItemId = item.objectID; lItemId = id; dialog = true">
-                    <b>
-                      {{ item.vol_str }} {{ item.page
-                      }}{{
-                        item.type
-                      }}
-                    </b>
+                  <a
+                    @click="
+                      rItemId = item.objectID
+                      lItemId = id
+                      dialog = true
+                    "
+                  >
+                    <b> {{ item.vol_str }} {{ item.page }}{{ item.type }} </b>
                   </a>
                   <!--
                   <nuxt-link
@@ -306,164 +306,133 @@
       hide-overlay
       transition="dialog-bottom-transition"
     >
-    <v-btn
-      fab
-      dark
-      fixed
-      top
-      right
-      small
-      @click="dialog = false"
-    >
-      <v-icon>mdi-close</v-icon>
-    </v-btn>
+      <v-btn fab dark fixed top right small @click="dialog = false">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
       <v-card>
-
         <div class="pa-4">
           <v-row>
             <v-col>
+              <v-card flat outlined>
+                <iframe
+                  :src="getIframeUrl(lItem)"
+                  width="100%"
+                  height="600"
+                  allowfullscreen
+                  frameborder="0"
+                ></iframe>
+                <div class="pa-4">
+                  <h3>
+                    {{ lItem.vol_str }} {{ lItem.page }}{{ lItem.type }}（{{
+                      lItem.target
+                    }}）
+                  </h3>
+                  <p class="my-2 text-center">
+                    <v-tooltip bottom v-if="lItem.prev">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          class="ma-1"
+                          @click="lItemId = lItem.prev"
+                          v-on="on"
+                          ><v-icon>mdi-chevron-left</v-icon></v-btn
+                        >
+                      </template>
+                      <span>{{ '前の' + lItem.type + 'へ' }}</span>
+                    </v-tooltip>
 
-            <v-card>
-            <v-card-title>
-              <h3>{{ lItem.vol_str }} {{ lItem.page
-                      }}{{
-                        lItem.type
-                      }}（{{lItem.target}}）</h3>
-</v-card-title>
-<div class="pa-4">
+                    <v-tooltip bottom v-if="lItem.next">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          class="ma-1"
+                          @click="lItemId = lItem.next"
+                          v-on="on"
+                          ><v-icon>mdi-chevron-right</v-icon></v-btn
+                        >
+                      </template>
+                      <span>{{ '次の' + lItem.type + 'へ' }}</span>
+                    </v-tooltip>
+                  </p>
 
-              
-
-              <iframe
-                :src="getIframeUrl(lItem)"
-                width="100%"
-                height="600"
-                allowfullscreen
-                frameborder="0"
-              ></iframe>
-
-              <p class="my-2 text-center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="lItem.prev"
-                class="ma-1"
-                @click="lItemId = lItem.prev"
-                v-on="on"
-                ><v-icon>mdi-chevron-left</v-icon></v-btn
-              >
-            </template>
-            <span>{{'前の' + 
-              lItem.type + "へ"
-            }}</span>
-          </v-tooltip>
-
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="lItem.next"
-                class="ma-1"
-                @click="lItemId = lItem.next"
-                v-on="on"
-                ><v-icon>mdi-chevron-right</v-icon></v-btn
-              >
-            </template>
-            <span>{{'次の' + 
-              lItem.type + "へ"
-            }}</span>
-          </v-tooltip>
-        </p>
-
-              <p
-                class="mt-2"
-                v-if="lItem.text"
-                v-html="lItem.text.split('\n').join('<b> / </b>')"
-                @select="selected"
-              @blur="selected"
-              @keyup="selected"
-              @click="selected"
-              ></p>
-              </div>
+                  <p
+                    class="mt-2"
+                    v-if="lItem.text"
+                    v-html="lItem.text.split('\n').join('<b> / </b>')"
+                    @select="selected"
+                    @blur="selected"
+                    @keyup="selected"
+                    @click="selected"
+                  ></p>
+                </div>
               </v-card>
             </v-col>
 
             <v-col>
-            <v-card>
-            <v-card-title>
-              <h3>{{ rItem.vol_str }} {{ rItem.page
-                      }}{{
-                        rItem.type
-                      }}（{{rItem.target}}）</h3>
-</v-card-title>
-<div class="pa-4">
+              <v-card flat outlined>
+                <iframe
+                  :src="getIframeUrl(rItem)"
+                  width="100%"
+                  height="600"
+                  allowfullscreen
+                  frameborder="0"
+                ></iframe>
 
-              <iframe
-                :src="getIframeUrl(rItem)"
-                width="100%"
-                height="600"
-                allowfullscreen
-                frameborder="0"
-              ></iframe>
+                <div class="pa-4">
+                  <h3>
+                    {{ rItem.vol_str }} {{ rItem.page }}{{ rItem.type }}（{{
+                      rItem.target
+                    }}）
+                  </h3>
 
-              <p class="my-2 text-center">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="rItem.prev"
-                class="ma-1"
-                @click="rItemId = rItem.prev"
-                v-on="on"
-                ><v-icon>mdi-chevron-left</v-icon></v-btn
-              >
-            </template>
-            <span>{{'前の' + 
-              rItem.type + "へ"
-            }}</span>
-          </v-tooltip>
+                  <p class="my-2 text-center">
+                    <v-tooltip bottom v-if="rItem.prev">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          class="ma-1"
+                          @click="rItemId = rItem.prev"
+                          v-on="on"
+                          ><v-icon>mdi-chevron-left</v-icon></v-btn
+                        >
+                      </template>
+                      <span>{{ '前の' + rItem.type + 'へ' }}</span>
+                    </v-tooltip>
 
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="rItem.next"
-                class="ma-1"
-                @click="rItemId = rItem.next"
-                v-on="on"
-                ><v-icon>mdi-chevron-right</v-icon></v-btn
-              >
-            </template>
-            <span>{{'次の' + 
-              rItem.type + "へ"
-            }}</span>
-          </v-tooltip>
-        </p>
+                    <v-tooltip bottom v-if="rItem.next">
+                      <template v-slot:activator="{ on }">
+                        <v-btn
+                          class="ma-1"
+                          @click="rItemId = rItem.next"
+                          v-on="on"
+                          ><v-icon>mdi-chevron-right</v-icon></v-btn
+                        >
+                      </template>
+                      <span>{{ '次の' + rItem.type + 'へ' }}</span>
+                    </v-tooltip>
+                  </p>
 
-        <p
-                class="mt-2">
-        <template v-for="(text, lineIndex) in rItem.label">
-                                <span
-                                  v-if="
-                                    lineIndex == highlight_line_index &&
-                                    selectedText != ''
-                                  "
-                                  :key="lineIndex"
-                                  class="background-color : yellow lighten-3"
-                                >
-                                  {{ text }}
-                                </span>
-                                <span v-else :key="lineIndex">
-                                  {{ text }}
-                                </span>
-                                <b
-                                  v-if="lineIndex != item.label.length - 1"
-                                  :key="'br-' + lineIndex"
-                                >
-                                  /
-                                </b>
-                              </template>
-                              </p>
-              
-
-              </div>
+                  <p class="mt-2">
+                    <template v-for="(text, lineIndex) in rItem.label">
+                      <span
+                        v-if="
+                          lineIndex == highlight_line_index &&
+                          selectedText != ''
+                        "
+                        :key="lineIndex"
+                        class="background-color : yellow lighten-3"
+                      >
+                        {{ text }}
+                      </span>
+                      <span v-else :key="lineIndex">
+                        {{ text }}
+                      </span>
+                      <b
+                        v-if="lineIndex != item.label.length - 1"
+                        :key="'br-' + lineIndex"
+                      >
+                        /
+                      </b>
+                    </template>
+                  </p>
+                </div>
               </v-card>
             </v-col>
           </v-row>
@@ -523,17 +492,26 @@ export default {
 
       const jsonData = {}
 
-
       const res = await axios.get(app.context.env.BASE_URL + '/nuxt.json')
-      for(let key in res.data){
+      for (let key in res.data) {
         jsonData[key] = res.data[key]
       }
 
-      const arr = ["kyoto01", "kyoto02", "ndl02", "ndl03", "ndl04", "nijl", "utokyo"]
-      for(let i = 0; i < arr.length; i++){
+      const arr = [
+        'kyoto01',
+        'kyoto02',
+        'ndl02',
+        'ndl03',
+        'ndl04',
+        'nijl',
+        'utokyo',
+      ]
+      for (let i = 0; i < arr.length; i++) {
         const e = arr[i]
-        const res = await axios.get(app.context.env.BASE_URL + '/data/json/'+e+'.json')
-        for(let key in res.data){
+        const res = await axios.get(
+          app.context.env.BASE_URL + '/data/json/' + e + '.json'
+        )
+        for (let key in res.data) {
           jsonData[key] = res.data[key]
         }
       }
@@ -560,10 +538,10 @@ export default {
 
       const result = {
         item: obj,
-        arr: sims2
+        arr: sims2,
       }
 
-      return { result, nuxt : jsonData }
+      return { result, nuxt: jsonData }
     }
   },
 
@@ -576,11 +554,11 @@ export default {
       isSignedIn: false,
       checkbox: {},
       like: true,
-      dialog : false,
-      rItemId : "",
-      lItemId : "",
-      lText : "",
-      highlight_line_index : -1
+      dialog: false,
+      rItemId: '',
+      lItemId: '',
+      lText: '',
+      highlight_line_index: -1,
     }
   },
 
@@ -595,42 +573,41 @@ export default {
     },
     title() {
       const item = this.item
-      return item.vol_str + " " + item.page + item.type
+      return item.vol_str + ' ' + item.page + item.type
     },
     items() {
       const arr = this.result.arr
       const items = ['すべて']
       for (let key in arr) {
-        if(arr[key].length > 0){
+        if (arr[key].length > 0) {
           items.push(key)
         }
-        
       }
       return items
     },
     rItem() {
       const itemId = this.rItemId
-      
+
       return this.nuxt[itemId] || {}
     },
     lItem() {
       const itemId = this.lItemId
-      this.selectedText = ""
+      this.selectedText = ''
       return this.nuxt[itemId] || {}
     },
-    
-    item(){
+
+    item() {
       return this.result.item
-    }
+    },
   },
 
   watch: {
     selectedText() {
       this.update_highlight()
     },
-    rItem(){
+    rItem() {
       this.update_highlight()
-    }
+    },
   },
 
   created() {
@@ -670,9 +647,13 @@ export default {
   },
 
   methods: {
-    update_highlight(){
+    update_highlight() {
       const selectedText = this.selectedText
       const item = this.rItem
+      if (Object.keys(item).length == 0) {
+        this.highlight_line_index = -1
+        return
+      }
       const texts = item.label
       const map = {}
       for (let j = 0; j < texts.length; j++) {
