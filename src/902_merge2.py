@@ -35,10 +35,11 @@ for file in files:
 
         id = obj["objectID"]
 
-        all3[id] = obj
-
         if obj["target"] == "校異源氏物語":
             all2[id] = obj
+        else:
+            all3[id] = obj
+            
 
     with open(file.replace("data", "../static/data/json"), 'w') as outfile:
         json.dump(all3, outfile, ensure_ascii=False,
