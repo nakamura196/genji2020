@@ -438,7 +438,7 @@
         </p>
 
         <p
-                class="mt-2"
+                class="mt-2">
         <template v-for="(text, lineIndex) in rItem.label">
                                 <span
                                   v-if="
@@ -521,8 +521,22 @@ export default {
     } else {
       const id = app.context.params.id
 
+      const jsonData = {}
+
+
       const res = await axios.get(app.context.env.BASE_URL + '/nuxt.json')
-      const jsonData = res.data
+      for(let key in res.data){
+        jsonData[key] = res.data[key]
+      }
+
+      const arr = ["kyoto01", "kyoto02", "ndl02", "ndl03", "ndl04", "nijl", "utokyo"]
+      for(let i = 0; i < arr.length; i++){
+        const e = arr[i]
+        const res = await axios.get(app.context.env.BASE_URL + '/data/json/'+e+'.json')
+        for(let key in res.data){
+          jsonData[key] = res.data[key]
+        }
+      }
 
       const obj = jsonData[id]
 

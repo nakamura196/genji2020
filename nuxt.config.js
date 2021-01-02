@@ -228,5 +228,71 @@ export default {
 
   generate: {
     //dir: 'docs'
+
+    routes() {
+      const baseUrl = process.env.BASE_URL
+
+      const fs = require('fs')
+      const res = JSON.parse(fs.readFileSync('static/nuxt.json'))
+
+      const jsonData = {}
+
+      const ids = []
+
+      for(let key in res){
+        jsonData[key] = res[key]
+        ids.push(key)
+      }
+
+      const arr = ["kyoto01", "kyoto02", "ndl02", "ndl03", "ndl04", "nijl", "utokyo"]
+      for(let i = 0; i < arr.length; i++){
+        const e = arr[i]
+        const res = JSON.parse(fs.readFileSync('static/data/json/'+e+'.json'))
+        for(let key in res){
+          jsonData[key] = res[key]
+        }
+      }
+
+      const pages = []
+
+      ids.map((id) => {
+
+        const obj = jsonData[id]
+
+        const sims = obj.arr
+        const sims2 = {}
+
+        for (const attr in sims) {
+          const arr = []
+
+          const obj2 = sims[attr]
+
+          for (let i = 0; i < obj2.length; i++) {
+            const sim = obj2[i]
+            const obj = jsonData[sim.id]
+            obj.score = sim.score
+            arr.push(obj)
+          }
+
+          sims2[attr] = arr
+        }
+
+        const result = {
+          item: obj,
+          arr: sims2
+        }
+
+        pages.push({
+          route: `/item/${id}`,
+          palyload: {
+            result,
+            nuxt: jsonData
+          },
+        })
+
+      })
+      return pages
+
+    }
   }
 }
