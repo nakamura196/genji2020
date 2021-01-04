@@ -1,0 +1,55 @@
+{
+  "name": "デジタル源氏物語（AI画像検索版）",
+  "short_name": "dgenji",
+  "description": "デジタル源氏物語（AI画像検索版）",
+  "icons": [
+    {
+      "src": "/genji2020/_nuxt/icons/icon_64x64.3e7366.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/genji2020/_nuxt/icons/icon_120x120.3e7366.png",
+      "sizes": "120x120",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/genji2020/_nuxt/icons/icon_144x144.3e7366.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/genji2020/_nuxt/icons/icon_152x152.3e7366.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/genji2020/_nuxt/icons/icon_192x192.3e7366.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/genji2020/_nuxt/icons/icon_384x384.3e7366.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/genji2020/_nuxt/icons/icon_512x512.3e7366.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/genji2020/?standalone=true",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "ja",
+  "orientation": "portrait"
+}
