@@ -23,8 +23,7 @@ const basePath = baseUrl + baseDir
 const lang = 'ja'
 const siteName = 'デジタル源氏物語（AI画像検索版）'
 env.siteName = siteName
-const siteDesc =
-  "デジタル源氏物語（AI画像検索版）"
+const siteDesc = 'デジタル源氏物語（AI画像検索版）'
 const siteKeywords = 'IIIF, 源氏物語'
 
 // images
@@ -32,7 +31,7 @@ const iconImages = baseDir + 'img/icons/'
 const ogpImages = basePath + 'img/ogp/' // cdnPath + 'img/ogp/'
 
 // pwa
-const shortName = "dgenji"
+const shortName = 'dgenji'
 const manifestIcon = 'img/icons/icon-512.png'
 
 export default {
@@ -142,11 +141,10 @@ export default {
   loading: { color: '#E64A19', height: '5px' },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
-  css: [
-  ],
+  css: [],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: [{ src: '~/plugins/init-client'}],
+  plugins: [{ src: '~/plugins/init-client' }],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
@@ -157,7 +155,13 @@ export default {
     '@nuxt/typescript-build',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/moment',
   ],
+
+  moment: {
+    // ここにオプションが記述できる
+    locales: ['ja'],
+  },
 
   // Modules (https://go.nuxtjs.dev/config-modules)
   modules: [
@@ -239,16 +243,26 @@ export default {
 
       const ids = []
 
-      for(let key in res){
+      for (let key in res) {
         jsonData[key] = res[key]
         ids.push(key)
       }
 
-      const arr = ["kyoto01", "kyoto02", "ndl02", "ndl03", "ndl04", "nijl", "utokyo"]
-      for(let i = 0; i < arr.length; i++){
+      const arr = [
+        'kyoto01',
+        'kyoto02',
+        'ndl02',
+        'ndl03',
+        'ndl04',
+        'nijl',
+        'utokyo',
+      ]
+      for (let i = 0; i < arr.length; i++) {
         const e = arr[i]
-        const res = JSON.parse(fs.readFileSync('static/data/json/'+e+'.json'))
-        for(let key in res){
+        const res = JSON.parse(
+          fs.readFileSync('static/data/json/' + e + '.json')
+        )
+        for (let key in res) {
           jsonData[key] = res[key]
         }
       }
@@ -256,7 +270,6 @@ export default {
       const pages = []
 
       ids.map((id) => {
-
         const obj = jsonData[id]
 
         const sims = obj.arr
@@ -279,20 +292,18 @@ export default {
 
         const result = {
           item: obj,
-          arr: sims2
+          arr: sims2,
         }
 
         pages.push({
           route: `/item/${id}`,
           palyload: {
             result,
-            nuxt: jsonData
+            nuxt: jsonData,
           },
         })
-
       })
       return pages
-
-    }
-  }
+    },
+  },
 }

@@ -281,17 +281,48 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
 
-                  <v-btn
-                    v-if="checkLike()"
-                    icon
-                    color="pink"
-                    @click="like = !like"
-                  >
-                    <v-icon class="mr-1">mdi-heart</v-icon>1
-                  </v-btn>
-                  <v-btn v-else icon @click="like = !like">
-                    <v-icon>mdi-heart-outline</v-icon>
-                  </v-btn>
+                  <template v-if="login">
+                    <template v-if="documentIds.includes(item.objectID)">
+                      <v-btn
+                        icon
+                        @click="
+                          good(
+                            item.objectID,
+                            !documents[item.objectID].includes(uid)
+                          )
+                        "
+                        :color="
+                          documents[item.objectID].includes(uid) ? 'pink' : ''
+                        "
+                      >
+                        <v-icon class="mr-1">{{
+                          documents[item.objectID].includes(uid)
+                            ? 'mdi-heart'
+                            : 'mdi-heart-outline'
+                        }}</v-icon
+                        >{{
+                          documents[item.objectID].length > 0
+                            ? documents[item.objectID].length
+                            : ''
+                        }}
+                      </v-btn>
+                    </template>
+                    <template v-else>
+                      <v-btn icon @click="good(item.objectID, true)">
+                        <v-icon class="mr-1">mdi-heart-outline</v-icon>
+                      </v-btn>
+                    </template>
+                  </template>
+                  <template v-else>
+                    <div class="my-1">
+                      <v-icon class="mr-1">mdi-heart-outline</v-icon
+                      >{{
+                        documentIds.includes(item.objectID)
+                          ? documents[item.objectID].length
+                          : ''
+                      }}
+                    </div>
+                  </template>
                 </v-card-actions>
               </v-card>
             </li>
@@ -439,13 +470,14 @@
 
           <div class="text-center my-10">
             <!-- <v-btn :to="localePath({name : 'item-id', params : {id : rItemId}})" large color="primary" class="mr-4">続きを見る</v-btn> -->
-
+            <!-- 
             <v-btn v-if="checkLike()" icon color="pink" @click="like = !like">
               <v-icon class="mr-1">mdi-heart</v-icon>1
             </v-btn>
             <v-btn v-else icon @click="like = !like">
               <v-icon>mdi-heart-outline</v-icon>
             </v-btn>
+            -->
           </div>
         </div>
       </v-card>
@@ -456,6 +488,9 @@
 <script>
 import axios from 'axios'
 import firebase from 'firebase'
+
+const FieldValue = firebase.firestore.FieldValue
+const firestore = firebase.firestore()
 
 function levenshteinDistance(str1, str2) {
   let r
@@ -559,6 +594,12 @@ export default {
       lItemId: '',
       lText: '',
       highlight_line_index: -1,
+
+      //
+      documents: [],
+      documentIds: [],
+      uid: '',
+      login: false,
     }
   },
 
@@ -611,6 +652,60 @@ export default {
   },
 
   created() {
+    firebase
+      .firestore()
+      .collection('kouis')
+      .doc(this.id)
+      .collection('documents')
+      .onSnapshot(
+        (res) => {
+          const documents = {}
+          const ids = []
+
+          res.forEach(async function (doc) {
+            /*
+            const users = []
+            const likedUsersRef = await firebase
+              .firestore()
+              .doc(doc.ref.path)
+              .collection('likedUsers')
+              .get()
+            likedUsersRef.forEach(function (user) {
+              users.push(user.id)
+            })
+            */
+            const users = doc.data().likedUsers || []
+            documents[doc.id] = users
+            ids.push(doc.id)
+          })
+
+          /*
+          for(let i = 0; i < res.docs.length; i++){
+            const doc = res.docs[i]
+            console.log(doc)
+
+            const users = []
+            const likedUsersRef = await firebase
+              .firestore()
+              .doc(doc.ref.path)
+              .collection('likedUsers')
+              .get()
+            likedUsersRef.forEach(function (user) {
+              users.push(user.id)
+            })
+            documents[doc.id] = users
+            ids.push(doc.id)
+          }
+          */
+
+          this.documents = documents
+          this.documentIds = ids
+        },
+        (error) => {
+          console.error('GET_REALTIME_LIST', error)
+        }
+      )
+
     this.onAuthStateChanged()
 
     console.log(this.result)
@@ -676,6 +771,8 @@ export default {
     },
     onAuthStateChanged() {
       firebase.auth().onAuthStateChanged((user) => {
+        this.uid = user.uid || ''
+        this.login = user ? true : false
         this.userName = user ? user.displayName : null
         this.userPic = user ? user.photoURL : null
         this.isSignedIn = !!user
@@ -746,6 +843,112 @@ export default {
       return !like
       */
       return like
+    },
+
+    async good(documentId, addFlag) {
+      // ----------
+      const koui = await firebase
+        .firestore()
+        .collection('kouis')
+        .doc(this.id)
+        .get()
+      const kouiRef = koui.ref
+      if (!koui.exists) {
+        await kouiRef.set({
+          id: this.id,
+          createTime: FieldValue.serverTimestamp(),
+          updateTime: FieldValue.serverTimestamp(),
+        })
+      }
+
+      // ----------
+      let doc = await firebase
+        .firestore()
+        .collection('kouis')
+        .doc(this.id)
+        .collection('documents')
+        .doc(documentId)
+        .get()
+      let docRef = doc.ref
+
+      if (!doc.exists) {
+        await docRef.set({
+          id: documentId,
+          createTime: FieldValue.serverTimestamp(),
+          updateTime: FieldValue.serverTimestamp(),
+          //likeCount: 0,
+          likedUsers : []
+        })
+      }
+
+      // ----------
+
+      const batch = firestore.batch()
+
+      const anotherUser = await firebase
+        .firestore()
+        .collection('users')
+        .doc(this.uid)
+        .get()
+      const anotherUserRef = anotherUser.ref
+
+      if (addFlag) {
+        /*
+        batch.set(
+          firestore
+            .doc(docRef.path)
+            .collection('likedUsers')
+            .doc(anotherUserRef.id),
+          {
+            id: anotherUserRef.id,
+            createTime: FieldValue.serverTimestamp(),
+          }
+        )
+        */
+
+        batch.update(firestore.doc(docRef.path), {
+          //id: anotherUserRef.id,
+          updateTime: FieldValue.serverTimestamp(),
+          likedUsers: firebase.firestore.FieldValue.arrayUnion(
+            anotherUserRef.id
+          ),
+        })
+
+        batch.set(
+          firestore
+            .doc(anotherUserRef.path)
+            .collection('likedDocs')
+            .doc(docRef.id),
+          {
+            id: docRef.id,
+            postRef: docRef,
+            createTime: FieldValue.serverTimestamp(),
+          }
+        )
+
+        //batch.update(docRef, { likeCount: FieldValue.increment(1) })
+        batch.update(anotherUserRef, { likeDocCount: FieldValue.increment(1) })
+      } else {
+        batch.update(firestore.doc(docRef.path), {
+          //id: anotherUserRef.id,
+          updateTime: FieldValue.serverTimestamp(),
+          likedUsers: firebase.firestore.FieldValue.arrayRemove(
+            anotherUserRef.id
+          ),
+        })
+
+        batch.delete(
+          firestore
+            .doc(anotherUserRef.path)
+            .collection('likedDocs')
+            .doc(docRef.id)
+        )
+
+        //batch.update(docRef, { likeCount: FieldValue.increment(-1) })
+        batch.update(anotherUserRef, { likeDocCount: FieldValue.increment(-1) })
+      }
+
+      await batch.commit()
     },
   },
 

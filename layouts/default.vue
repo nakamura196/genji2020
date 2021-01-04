@@ -17,7 +17,7 @@
             :to="
               localePath({
                 name: 'search',
-                query: { 'genji[sortBy]': 'genji_page_asc' }
+                query: { 'genji[sortBy]': 'genji_page_asc' },
               })
             "
           >
@@ -25,7 +25,7 @@
               <v-icon>mdi-magnify</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title>{{ $t("search") }}</v-list-item-title>
+              <v-list-item-title>{{ $t('search') }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
 
@@ -34,7 +34,7 @@
               <v-icon>mdi-information</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title>{{ $t("legend") }}</v-list-item-title>
+              <v-list-item-title>{{ $t('legend') }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
 
@@ -81,7 +81,7 @@
           <nuxt-link
             :to="
               localePath({
-                name: 'index'
+                name: 'index',
               })
             "
             style="color: inherit; text-decoration: inherit"
@@ -97,7 +97,7 @@
             <v-btn depressed btn v-on="on">
               <v-icon class="mr-2">mdi-translate</v-icon>
               <template v-if="$vuetify.breakpoint.name != 'xs'">
-                {{ $i18n.locale == "ja" ? "日本語" : "English" }}</template
+                {{ $i18n.locale == 'ja' ? '日本語' : 'English' }}</template
               >
               <v-icon class="ml-2">mdi-menu-down</v-icon>
             </v-btn>
@@ -214,35 +214,35 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "nuxt-property-decorator";
-import firebase from "../plugins/firebase";
+import { Vue, Component } from 'nuxt-property-decorator'
+import firebase from '../plugins/firebase'
 
 @Component({
-  components: {}
+  components: {},
 })
 export default class search extends Vue {
   fab: boolean = false
 
-  drawer: boolean = false;
-  baseUrl: string = process.env.BASE_URL || "";
-  siteName: string = process.env.siteName || "";
+  drawer: boolean = false
+  baseUrl: string = process.env.BASE_URL || ''
+  siteName: string = process.env.siteName || ''
 
   //isSignedIn: boolean = false;
-  userName: any = null;
-  userPic: any = null;
-  dialog: boolean = false;
-  dialog4login: boolean = false;
+  userName: any = null
+  userPic: any = null
+  dialog: boolean = false
+  dialog4login: boolean = false
 
   get isSignedIn(): boolean {
-    return this.$store.getters.getIsSignedIn;
+    return this.$store.getters.getIsSignedIn
   }
 
   set isSignedIn(value) {
-    this.$store.commit("setSignedIn", value);
+    this.$store.commit('setSignedIn', value)
   }
 
   created() {
-    this.onAuthStateChanged();
+    this.onAuthStateChanged()
   }
 
   onScroll(e: any): void {
@@ -257,7 +257,7 @@ export default class search extends Vue {
   }
 
   signInWithGoogle() {
-    this.$store.dispatch("login");
+    this.$store.dispatch('login')
     /*
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase
@@ -266,28 +266,28 @@ export default class search extends Vue {
       .catch(error => alert(error.message))
       .then(() => (this.dialog4login = !this.dialog4login));
     */
-    this.dialog4login = !this.dialog4login;
+    this.dialog4login = !this.dialog4login
   }
 
   signInWithTwitter() {
-    const provider = new firebase.auth.TwitterAuthProvider();
+    const provider = new firebase.auth.TwitterAuthProvider()
     firebase
       .auth()
       .signInWithPopup(provider)
-      .catch(error => alert(error.message))
-      .then(() => (this.dialog4login = !this.dialog4login));
+      .catch((error) => alert(error.message))
+      .then(() => (this.dialog4login = !this.dialog4login))
   }
 
   onAuthStateChanged() {
-    firebase.auth().onAuthStateChanged(user => {
-      this.userName = user ? user.displayName : null;
-      this.userPic = user ? user.photoURL : null;
-      this.isSignedIn = user ? true : false;
-    });
+    firebase.auth().onAuthStateChanged((user) => {
+      this.userName = user ? user.displayName : null
+      this.userPic = user ? user.photoURL : null
+      this.isSignedIn = user ? true : false
+    })
   }
 
   async signOut() {
-    await firebase.auth().signOut();
+    await firebase.auth().signOut()
   }
 }
 </script>
