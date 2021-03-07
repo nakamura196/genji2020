@@ -29,12 +29,12 @@
             </v-list-item-content>
           </v-list-item>
 
-          <v-list-item link :to="localePath({ name: 'legend' })">
+          <v-list-item link :to="localePath({ name: 'about' })">
             <v-list-item-action>
               <v-icon>mdi-information</v-icon>
             </v-list-item-action>
             <v-list-item-content>
-              <v-list-item-title>{{ $t('legend') }}</v-list-item-title>
+              <v-list-item-title>{{ $t('about_') }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
 
@@ -75,7 +75,7 @@
         </v-list>
       </v-navigation-drawer>
 
-      <v-app-bar>
+      <v-app-bar dark>
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
         <v-toolbar-title>
           <nuxt-link
@@ -291,3 +291,11 @@ export default class search extends Vue {
   }
 }
 </script>
+<style>
+a {
+  text-decoration: none;
+}
+tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+</style>

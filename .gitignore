@@ -1,3 +1,9 @@
+/tmp
+
+# Window image file caches
+Thumbs.db
+ehthumbs.db
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Node template
 # Logs
@@ -88,3 +94,13 @@ sw.*
 
 # Vim swap files
 *.swp
+
+# rdf files
+src/entity/data/test
+src/entity/data/test2
+
+~*
+
+src/data/images
+src/entity/data
+src/entity2/data

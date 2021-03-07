@@ -7,84 +7,107 @@
       index-name="genji"
     >
       <ais-configure :attributesToSnippet="['text', 'label']"/>
+      <v-sheet color="grey lighten-2">
+        <v-container fluid class="py-4">
+          <v-breadcrumbs class="py-0" :items="bh">
+            <template #divider>
+              <v-icon>mdi-chevron-right</v-icon>
+            </template>
+          </v-breadcrumbs>
+        </v-container>
+      </v-sheet>
       <v-container class="my-5">
-        <v-row>
 
-          <v-col col="12" sm="8" order-sm="12">
-            <client-only>
-              <ais-powered-by class="my-2" />
-            </client-only>
-            
-            <ais-search-box :placeholder="$t('add_a_search_term')" />
+        <h2>{{ $t('search') }}</h2>
 
-            <v-sheet class="pa-4 my-4" color="grey lighten-3">
-              <v-row dense>
-                <v-col cols="12" :sm="6">
-                  <ais-stats>
-                    <p
-                      class="my-0"
-                      slot-scope="{
-                        hitsPerPage,
-                        nbPages,
-                        nbHits,
-                        page,
-                        processingTimeMS,
-                        query,
-                      }"
+        <p class="my-2">
+          『校異源氏物語』の本文テキストを検索します。
+        </p>
+
+        <v-row class="my-2" dense>
+          <v-col cols="12" md="10"
+            ><ais-search-box :placeholder="$t('add_a_search_term')"
+          /></v-col>
+          <v-col cols="12" md="2"
+            ><client-only
+              ><div class="text-right">
+                <ais-powered-by /></div></client-only
+          ></v-col>
+        </v-row>
+
+        <v-row class="mt-10" dense>
+          <v-col cols="12" lg="4"
+            ><ais-stats>
+              <h3 slot-scope="{ nbHits }" class="my-0">
+                {{ $t('search_result') }}: {{ nbHits.toLocaleString() }}
+                {{ $t('hits') }}
+              </h3>
+            </ais-stats></v-col
+          >
+          <v-col cols="12" lg="8"
+            ><v-row dense>
+              <v-col cols="12" :lg="6">
+                <ais-pagination :padding="2" class="mb-4" />
+              </v-col>
+              <v-col cols="12" :lg="6">
+                <v-row>
+                  <v-col cols="12" :sm="6">
+                    <ais-hits-per-page
+                      :items="[
+                        { text: '24', value: 24, default: true },
+                        { text: '60', value: 60 },
+                        { text: '120', value: 120 },
+                        { text: '512', value: 512 },
+                      ]"
                     >
-                      {{ $t('search_result') }}: {{ nbHits.toLocaleString() }} {{ $t('hits') }}
-                    </p>
-                  </ais-stats>
-                </v-col>
-                    <v-col cols="12" :sm="3">
-                      <ais-hits-per-page
-                    :items="[
-                      { text: '24', value: 24, default: true },
-                      { text: '60', value: 60 },
-                      { text: '120', value: 120 },
-                      { text: '512', value: 512 },
-                    ]"
-                  >
-                  <v-select
-                  dense
-                      slot-scope="{ items, refine }"
-                      :items="items"
-                      v-model="perPage"
-                      :label="$t('items_per_page')"
-                      @change="refine(perPage)"
-                    >
-                    {{ddd(items)}}
-                    </v-select>
+                      <v-select
+                        v-model="perPage"
+                        slot-scope="{ items, refine }"
+                        dense
+                        :items="items"
+                        :label="$t('items_per_page')"
+                        @change="refine(perPage)"
+                      >
+                        {{ getPageValue(items) }}
+                      </v-select>
                     </ais-hits-per-page>
-                    </v-col>
-                    <v-col cols="12" :sm="3">
-                      <ais-sort-by
-                    :items="[
-                      { value: 'genji', label: $t('relevance') },
+                  </v-col>
+                  <v-col cols="12" :sm="6" v-if="">
+                    <ais-sort-by
+                      :items="[
+                        { value: 'genji', label: $t('relevance') },
                       { value: 'genji_page_asc', label: $t('ページ') + ' ' + $t('asc') },
                       { value: 'genji_page_desc', label: $t('ページ') + ' ' + $t('desc') },
-                    ]"
-                  >
-                    <v-select
-                    dense
-                      slot-scope="{ items, currentRefinement, refine }"
-                      :items="bbb(items)"
-                      v-model="sort"
-                      :label="$t('sort_by')"
-                      @change="refine(sort)"
+                        /*
+                      {
+                        value: 'dev_MAIN_temporal_asc',
+                        label: this.$t('temporal') + ' ' + this.$t('asc'),
+                      },
+                      */
+                      ]"
                     >
-                    {{ccc(currentRefinement)}}
-                    </v-select>
-                  </ais-sort-by>
-                    
-                  
+                      <v-select
+                        v-model="sort"
+                        slot-scope="{ items, currentRefinement, refine }"
+                        dense
+                        :items="getSortItems(items)"
+                        :label="$t('sort_by')"
+                        @change="refine(sort)"
+                      >
+                        {{ getSortValue(currentRefinement) }}
+                      </v-select>
+                    </ais-sort-by>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row></v-col
+          >
+        </v-row>
+        
+        <v-row class="mt-5">
 
-                  
-                </v-col>
-              </v-row>
-            </v-sheet>
+          <v-col col="12" sm="9" order-sm="12">
 
-            <ais-pagination :padding="2" class="my-4" />
 
             <ais-hits>
               <v-row slot-scope="{ items }">
@@ -141,22 +164,12 @@
               </v-row>
             </ais-hits>
 
-            <ais-pagination :padding="2" class="my-4" />
+            <ais-pagination :padding="2" class="mt-10" />
           </v-col>
 
-          <v-col col="12" sm="4" order-sm="1">
-            <v-row>
-              <v-col col="12" sm="6">
-                <h2>{{ $t('filter') }}</h2>
-              </v-col>
-              <v-col col="12" sm="6" class="text-right">
-                <ais-clear-refinements>
-                  <span slot="resetLabel">{{ $t('reset') }}</span>
-                </ais-clear-refinements>
-              </v-col>
-            </v-row>
+          <v-col col="12" sm="3" order-sm="1">
 
-            <v-card flat outlined class="mt-4">
+            <v-card flat class="mb-4">
               <v-card-title class="headline grey lighten-2">
                 {{ $t('vol_str') }}
               </v-card-title>
@@ -196,7 +209,29 @@ export default {
         stateMapping: simple(),
       },
       sort: "",
-      perPage: ""
+      perPage: "",
+
+      sortItems: [
+        { value: 'dev_MAIN', label: this.$t('relevance') },
+        /*
+        {
+          value: 'dev_MAIN_temporal_asc',
+          label: this.$t('temporal') + ' ' + this.$t('asc'),
+        },
+        */
+      ],
+
+      bh: [
+        {
+          text: this.$t('top'),
+          disabled: false,
+          to: this.localePath({ name: 'index' }),
+          exact: true,
+        },
+        {
+          text: this.$t('search'),
+        },
+      ],
     }
   },
 
@@ -207,6 +242,7 @@ export default {
   },
 
   methods: {
+    /*
     bbb(items){
       const items2 = []
       for(let i = 0; i < items.length; i++){
@@ -230,9 +266,37 @@ export default {
         }
       }
     },
+    */
+
     curationUrl(item){
       return "http://codh.rois.ac.jp/software/iiif-curation-viewer/demo/?curation=" + item.curation + "&mode=annotation&lang=ja&pos="+item.pos
-    }
+    },
+
+    getSortItems(items) {
+      const array = []
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        array.push({
+          text: item.label,
+          value: item.value,
+        })
+      }
+      return array
+    },
+
+    getSortValue(value) {
+      this.sort = value
+    },
+
+    getPageValue(items) {
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item.isRefined) {
+          this.perPage = item.value
+          break
+        }
+      }
+    },
   }
 }
 </script>

@@ -1,40 +1,98 @@
 <template>
   <div>
-    <v-container class="py-5">
-      <iframe
-        :src="getIframeUrl(item)"
-        width="100%"
-        height="400"
-        allowfullscreen
-        frameborder="0"
-      ></iframe>
+    <v-sheet color="grey lighten-2">
+      <v-container fluid class="py-4">
+        <v-breadcrumbs class="py-0" :items="bh">
+          <template #divider>
+            <v-icon>mdi-chevron-right</v-icon>
+          </template>
+        </v-breadcrumbs>
+      </v-container>
+    </v-sheet>
+    <p class="text-center mb-5 mt-2">
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              v-if="item.next"
+              class="ma-1"
+              fab
+              dark
+              small
+              :to="
+                localePath({
+                  name: 'item-id',
+                  params: { id: item.next },
+                })
+              "
+              v-on="on"
+              ><v-icon>mdi-chevron-left</v-icon></v-btn
+            >
+          </template>
+          <span>{{ '次の' + item.type + 'へ' }}</span>
+        </v-tooltip>
 
-      <v-expansion-panels
-        tile
-        :value="item.attribution == '国立国会図書館' ? 0 : 1"
-      >
-        <v-expansion-panel class="my-4">
-          <v-expansion-panel-header>
-            {{
-              item.attribution == '国立国会図書館' ? 'テキスト' : 'OCRテキスト'
-            }}
-          </v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <p
-              @select="selected"
+        <v-tooltip bottom>
+          <template #activator="{ on }">
+            <v-btn
+              v-if="item.prev"
+              class="ma-1"
+              fab
+              dark
+              small
+              :to="
+                localePath({
+                  name: 'item-id',
+                  params: { id: item.prev },
+                })
+              "
+              v-on="on"
+              ><v-icon>mdi-chevron-right</v-icon></v-btn
+            >
+          </template>
+          <span>{{ '前の' + item.type + 'へ' }}</span>
+        </v-tooltip>
+      </p>
+
+      <v-sheet color="grey lighten-3 mt-5 px-5">
+      <v-row>
+        <v-col cols="12" sm="6">
+          <v-card flat class="my-5 scroll vertical"
+            :style="`height: ${/*height * 0.85*/ 400}px; width: ${width / 2}px`"
+          >
+            <div class="pa-4 px-5">
+              <span @select="selected"
               @blur="selected"
               @keyup="selected"
-              @click="selected"
-              v-html="item.text.split('\n').join('<b> / </b>')"
-            ></p>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-container>
-    <v-container>
-      <div class="text-center">
+              @click="selected" v-html="item.text.split('\n').join('<br/>')"> </span>
+
+            </div>
+            </v-card>
+          </v-col>
+        <v-col cols="12" sm="6">
+          <iframe
+          class="my-5"
+      :src="getIframeUrl(item)"
+      width="100%"
+      height="400"
+      allowfullscreen
+      frameborder="0"
+    ></iframe>
+    </v-col>
+          </v-row>
+        </v-sheet>
+
+    
+
+    <v-container class="mt-5 py-5">
+      
+
+      
+
+      <h2>{{ title }}</h2>
+
+      <div class="text-center my-2">
         <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-btn
               class="mx-1"
               icon
@@ -48,7 +106,7 @@
         </v-tooltip>
 
         <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-btn
               class="mx-1"
               icon
@@ -62,7 +120,7 @@
         </v-tooltip>
 
         <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-btn
               class="mx-1"
               icon
@@ -76,7 +134,7 @@
         </v-tooltip>
 
         <v-tooltip bottom>
-          <template v-slot:activator="{ on }">
+          <template #activator="{ on }">
             <v-btn
               class="mx-1"
               icon
@@ -90,95 +148,49 @@
           </template>
           <span>{{ 'Pocket' }}</span>
         </v-tooltip>
-
-        <p class="my-4">
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="item.prev"
-                class="ma-1"
-                :to="
-                  localePath({
-                    name: 'item-id',
-                    params: { id: item.prev },
-                  })
-                "
-                v-on="on"
-                ><v-icon>mdi-chevron-left</v-icon></v-btn
-              >
-            </template>
-            <span>{{ '前の' + item.type + 'へ' }}</span>
-          </v-tooltip>
-
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                v-if="item.next"
-                class="ma-1"
-                :to="
-                  localePath({
-                    name: 'item-id',
-                    params: { id: item.next },
-                  })
-                "
-                v-on="on"
-                ><v-icon>mdi-chevron-right</v-icon></v-btn
-              >
-            </template>
-            <span>{{ '次の' + item.type + 'へ' }}</span>
-          </v-tooltip>
-        </p>
       </div>
+
+      <v-simple-table v-if="false" class="mt-5">
+        <template #default>
+          <tbody>
+            <tr>
+              <td width="30%">URL</td>
+              <td style="overflow-wrap: break-word" class="py-5">
+                <a :href="prefix + '/item/' + $route.params.id">{{
+                  prefix + '/item/' + $route.params.id
+                }}</a>
+              </td>
+            </tr>
+
+            <tr>
+              <td width="30%">{{ $t('target') }}</td>
+              <td style="overflow-wrap: break-word" class="py-5">
+                {{ item.target }}
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
     </v-container>
 
-    <v-sheet class="pa-4 mt-5 mb-3" color="grey lighten-3">
+    <v-sheet class="pa-4 my-5" color="grey lighten-3">
       <v-container>
-        <dl class="row">
-          <dt class="col-sm-3 text-muted"><b>URL</b></dt>
-          <dd class="col-sm-9" style="overflow-wrap: break-word">
-            <a :href="prefix + '/item/' + $route.params.id">{{
-              prefix + '/item/' + $route.params.id
-            }}</a>
-          </dd>
-        </dl>
-
-        <dl class="row">
-          <dt class="col-sm-3 text-muted">
-            <b>{{ $t('title') }}</b>
-          </dt>
-          <dd class="col-sm-9">
-            {{ item.vol_str }} {{ item.page }}{{ item.type }}
-          </dd>
-        </dl>
-
-        <dl class="row">
-          <dt class="col-sm-3 text-muted">
-            <b>{{ $t('target') }}</b>
-          </dt>
-          <dd class="col-sm-9">
-            {{ item.target }}
-          </dd>
-        </dl>
-      </v-container>
-    </v-sheet>
-
-    <v-container>
-      <v-sheet class="pa-4 mt-5 mb-3" color="grey lighten-3">
         <v-row>
-          <v-col cols="12" :sm="5"
-            ><h3>類似コマ</h3>
-            <small>
+          <v-col cols="12" :sm="8"
+            ><h3>類似度の高い見開きページ</h3>
+            <p class="my-0">
               <ul>
                 <li>
-                  「校異源氏物語テキスト」または「くずし字OCR結果テキスト」間の編集距離に基づく類似度を利用しています。
+                  『校異源氏物語』のテキストデータと、くずし字OCR結果のテキストデータ間の編集距離を用いて、類似度の高い見開きページを表示しています。詳しくは、<nuxt-link :to="localePath({name: 'about'})">こちら</nuxt-link>をご覧ください。
                 </li>
                 <li>
-                  すでに頁番号が付与されている場合には、背景が黄色になります。
+                  背景が黄色になっているものは、『校異源氏物語』の頁番号が既に付与されているページです。
                 </li>
-              </ul></small
-            ></v-col
+              </ul>
+              </p>
+              </v-col
           >
-          <v-col cols="12" :sm="7"
+          <v-col cols="12" :sm="4"
             ><v-select
               v-model="select"
               :items="items"
@@ -186,14 +198,16 @@
             ></v-select
           ></v-col>
         </v-row>
-      </v-sheet>
+      </v-container>
+    </v-sheet>
 
+    <v-container>
       <template v-for="(arr, attr) in result.arr">
         <div
-          :key="attr"
           v-if="(select == 'すべて' || attr == select) && items.includes(attr)"
+          :key="attr"
         >
-          <h3 class="mb-3 mt-5">{{ attr }}</h3>
+          <h3 class="mb-3 mt-5">{{ labelConverter(attr) }}</h3>
 
           <ul class="horizontal-list">
             <li v-for="(item, index) in arr" :key="index" class="item">
@@ -285,14 +299,14 @@
                     <template v-if="documentIds.includes(item.objectID)">
                       <v-btn
                         icon
+                        :color="
+                          documents[item.objectID].includes(uid) ? 'pink' : ''
+                        "
                         @click="
                           good(
                             item.objectID,
                             !documents[item.objectID].includes(uid)
                           )
-                        "
-                        :color="
-                          documents[item.objectID].includes(uid) ? 'pink' : ''
                         "
                       >
                         <v-icon class="mr-1">{{
@@ -331,6 +345,8 @@
       </template>
     </v-container>
 
+    <p class="my-10"></p>
+
     <v-dialog
       v-model="dialog"
       fullscreen
@@ -353,45 +369,53 @@
                   frameborder="0"
                 ></iframe>
                 <div class="pa-4">
-                  <h3>
-                    {{ lItem.vol_str }} {{ lItem.page }}{{ lItem.type }}（{{
-                      lItem.target
-                    }}）
-                  </h3>
+                  
                   <p class="my-2 text-center">
-                    <v-tooltip bottom v-if="lItem.prev">
-                      <template v-slot:activator="{ on }">
+                    <v-tooltip v-if="lItem.next" bottom>
+                      <template #activator="{ on }">
                         <v-btn
                           class="ma-1"
-                          @click="lItemId = lItem.prev"
-                          v-on="on"
+                          fab
+                          dark
+                          small
+              @click="lItemId = lItem.next"
+              v-on="on"
                           ><v-icon>mdi-chevron-left</v-icon></v-btn
-                        >
-                      </template>
-                      <span>{{ '前の' + lItem.type + 'へ' }}</span>
-                    </v-tooltip>
-
-                    <v-tooltip bottom v-if="lItem.next">
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          class="ma-1"
-                          @click="lItemId = lItem.next"
-                          v-on="on"
-                          ><v-icon>mdi-chevron-right</v-icon></v-btn
                         >
                       </template>
                       <span>{{ '次の' + lItem.type + 'へ' }}</span>
                     </v-tooltip>
+
+                    <v-tooltip v-if="lItem.prev" bottom>
+                      <template #activator="{ on }">
+                        <v-btn
+                          class="ma-1"
+                          fab
+                          dark
+                          small
+              @click="lItemId = lItem.prev"
+              v-on="on"
+                          ><v-icon>mdi-chevron-right</v-icon></v-btn
+                        >
+                      </template>
+                      <span>{{ '前の' + lItem.type + 'へ' }}</span>
+                    </v-tooltip>
                   </p>
 
+                  <h2>
+                    {{ lItem.vol_str }} {{ lItem.page }}{{ lItem.type }}（{{
+                      lItem.target
+                    }}）
+                  </h2>
+
                   <p
-                    class="mt-2"
                     v-if="lItem.text"
-                    v-html="lItem.text.split('\n').join('<b> / </b>')"
+                    class="mt-2"
                     @select="selected"
                     @blur="selected"
                     @keyup="selected"
                     @click="selected"
+                    v-html="lItem.text.split('\n').join('<b> / </b>')"
                   ></p>
                 </div>
               </v-card>
@@ -408,37 +432,45 @@
                 ></iframe>
 
                 <div class="pa-4">
-                  <h3>
-                    {{ rItem.vol_str }} {{ rItem.page }}{{ rItem.type }}（{{
-                      rItem.target
-                    }}）
-                  </h3>
+                  
 
                   <p class="my-2 text-center">
-                    <v-tooltip bottom v-if="rItem.prev">
-                      <template v-slot:activator="{ on }">
+                    <v-tooltip v-if="rItem.next" bottom>
+                      <template #activator="{ on }">
                         <v-btn
                           class="ma-1"
-                          @click="rItemId = rItem.prev"
-                          v-on="on"
+                          fab
+                          dark
+                          small
+              @click="rItemId = rItem.next"
+              v-on="on"
                           ><v-icon>mdi-chevron-left</v-icon></v-btn
-                        >
-                      </template>
-                      <span>{{ '前の' + rItem.type + 'へ' }}</span>
-                    </v-tooltip>
-
-                    <v-tooltip bottom v-if="rItem.next">
-                      <template v-slot:activator="{ on }">
-                        <v-btn
-                          class="ma-1"
-                          @click="rItemId = rItem.next"
-                          v-on="on"
-                          ><v-icon>mdi-chevron-right</v-icon></v-btn
                         >
                       </template>
                       <span>{{ '次の' + rItem.type + 'へ' }}</span>
                     </v-tooltip>
+
+                    <v-tooltip v-if="rItem.prev" bottom>
+                      <template #activator="{ on }">
+                        <v-btn
+                          class="ma-1"
+                          fab
+                          dark
+                          small
+              @click="rItemId = rItem.prev"
+              v-on="on"
+                          ><v-icon>mdi-chevron-right</v-icon></v-btn
+                        >
+                      </template>
+                      <span>{{ '前の' + rItem.type + 'へ' }}</span>
+                    </v-tooltip>
                   </p>
+
+                  <h2>
+                    {{ rItem.vol_str }} {{ rItem.page }}{{ rItem.type }}（{{
+                      labelConverter(rItem.target)
+                    }}）
+                  </h2>
 
                   <p class="mt-2">
                     <template v-for="(text, lineIndex) in rItem.label">
@@ -528,7 +560,7 @@ export default {
       const jsonData = {}
 
       const res = await axios.get(app.context.env.BASE_URL + '/nuxt.json')
-      for (let key in res.data) {
+      for (const key in res.data) {
         jsonData[key] = res.data[key]
       }
 
@@ -546,7 +578,7 @@ export default {
         const res = await axios.get(
           app.context.env.BASE_URL + '/data/json/' + e + '.json'
         )
-        for (let key in res.data) {
+        for (const key in res.data) {
           jsonData[key] = res.data[key]
         }
       }
@@ -600,6 +632,43 @@ export default {
       documentIds: [],
       uid: '',
       login: false,
+
+      //
+      width: window.innerWidth
+    }
+  },
+
+  head() {
+    const title = this.title
+    return {
+      title,
+      meta: [
+        {
+          hid: 'og:title',
+          property: 'og:title',
+          content: title,
+        },
+        {
+          hid: 'og:type',
+          property: 'og:type',
+          content: 'article',
+        },
+        {
+          hid: 'og:url',
+          property: 'og:url',
+          content: this.url,
+        },
+        {
+          hid: 'og:image',
+          property: 'og:image',
+          content: this.result.item.image,
+        },
+        {
+          hid: 'twitter:card',
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+      ],
     }
   },
 
@@ -616,10 +685,29 @@ export default {
       const item = this.item
       return item.vol_str + ' ' + item.page + item.type
     },
+    bh() {
+      return [
+        {
+          text: this.$t('top'),
+          disabled: false,
+          to: this.localePath({ name: 'index' }),
+          exact: true,
+        },
+        {
+          text: this.$t('search'),
+          disabled: false,
+          to: this.localePath({ name: 'search', query: { 'genji[sortBy]': 'genji_page_asc' } }),
+          text: this.$t('search'),
+        },
+        {
+          text: this.title,
+        },
+      ]
+    },
     items() {
       const arr = this.result.arr
       const items = ['すべて']
-      for (let key in arr) {
+      for (const key in arr) {
         if (arr[key].length > 0) {
           items.push(key)
         }
@@ -708,8 +796,6 @@ export default {
 
     this.onAuthStateChanged()
 
-    console.log(this.result)
-
     const checkbox = {}
 
     const arr = this.result.arr
@@ -742,6 +828,18 @@ export default {
   },
 
   methods: {
+    labelConverter(value){
+      const map = {
+        "NDL02" : "伝嵯峨本（国会図書館所蔵）",
+        "NDL03" : "近世前期写本（国会図書館所蔵）",
+        "NDL04" : "元和9年古活字版（国会図書館所蔵）",
+        "京大本01" : "平松家本（京都大学所蔵）",
+        "京大本02" : "中院文庫本（京都大学所蔵）",
+        "東大本" : "東京大学本（東京大学総合図書館所蔵）",
+        "湖月抄（国文研所蔵）" : "『湖月抄』鵜飼文庫（国文研所蔵）",
+      }
+      return map[value]
+    },
     update_highlight() {
       const selectedText = this.selectedText
       const item = this.rItem
@@ -772,7 +870,7 @@ export default {
     onAuthStateChanged() {
       firebase.auth().onAuthStateChanged((user) => {
         this.uid = user.uid || ''
-        this.login = user ? true : false
+        this.login = !!user
         this.userName = user ? user.displayName : null
         this.userPic = user ? user.photoURL : null
         this.isSignedIn = !!user
@@ -862,22 +960,22 @@ export default {
       }
 
       // ----------
-      let doc = await firebase
+      const doc = await firebase
         .firestore()
         .collection('kouis')
         .doc(this.id)
         .collection('documents')
         .doc(documentId)
         .get()
-      let docRef = doc.ref
+      const docRef = doc.ref
 
       if (!doc.exists) {
         await docRef.set({
           id: documentId,
           createTime: FieldValue.serverTimestamp(),
           updateTime: FieldValue.serverTimestamp(),
-          //likeCount: 0,
-          likedUsers : []
+          // likeCount: 0,
+          likedUsers: [],
         })
       }
 
@@ -907,7 +1005,7 @@ export default {
         */
 
         batch.update(firestore.doc(docRef.path), {
-          //id: anotherUserRef.id,
+          // id: anotherUserRef.id,
           updateTime: FieldValue.serverTimestamp(),
           likedUsers: firebase.firestore.FieldValue.arrayUnion(
             anotherUserRef.id
@@ -926,11 +1024,11 @@ export default {
           }
         )
 
-        //batch.update(docRef, { likeCount: FieldValue.increment(1) })
+        // batch.update(docRef, { likeCount: FieldValue.increment(1) })
         batch.update(anotherUserRef, { likeDocCount: FieldValue.increment(1) })
       } else {
         batch.update(firestore.doc(docRef.path), {
-          //id: anotherUserRef.id,
+          // id: anotherUserRef.id,
           updateTime: FieldValue.serverTimestamp(),
           likedUsers: firebase.firestore.FieldValue.arrayRemove(
             anotherUserRef.id
@@ -944,46 +1042,13 @@ export default {
             .doc(docRef.id)
         )
 
-        //batch.update(docRef, { likeCount: FieldValue.increment(-1) })
+        // batch.update(docRef, { likeCount: FieldValue.increment(-1) })
         batch.update(anotherUserRef, { likeDocCount: FieldValue.increment(-1) })
       }
 
       await batch.commit()
-    },
-  },
-
-  head() {
-    const title = this.title
-    return {
-      title,
-      meta: [
-        {
-          hid: 'og:title',
-          property: 'og:title',
-          content: title,
-        },
-        {
-          hid: 'og:type',
-          property: 'og:type',
-          content: 'article',
-        },
-        {
-          hid: 'og:url',
-          property: 'og:url',
-          content: this.url,
-        },
-        {
-          hid: 'og:image',
-          property: 'og:image',
-          content: this.result.item.image,
-        },
-        {
-          hid: 'twitter:card',
-          name: 'twitter:card',
-          content: 'summary_large_image',
-        },
-      ],
     }
+    
   },
 }
 </script>
@@ -1001,5 +1066,14 @@ export default {
   display: inline-block;
   /* 見た目調整 */
   margin-right: 16px;
+}
+.scroll {
+  overflow-y: auto;
+}
+
+.vertical {
+  -webkit-writing-mode: vertical-rl;
+  -ms-writing-mode: tb-rl;
+  writing-mode: vertical-rl;
 }
 </style>
